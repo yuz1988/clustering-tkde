@@ -1,0 +1,232 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+
+% ******************** Packages **************************
+\usepackage{balance}
+\usepackage{amsmath,amssymb,bm,bbm}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\DontPrintSemicolon
+\renewcommand{\CommentSty}[1]{\textnormal{\textsf{\textit{#1}}}\unskip}
+\SetKwProg{fnDef}{def}{}{}
+\usepackage{txfonts}
+\SetKwComment{tcp}{$\rhd$\, }{}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@makecaption}
+  {\scshape}
+  {}
+  {}
+  {}
+  \makeatother
+
+
+%%%  Footnotes / Endnotes
+\interfootnotelinepenalty=10000  % Split footnotes are annoying
+  
+\usepackage{color}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{xspace}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[amssymb]{ktmath}
+\usepackage{multirow}
+%\usepackage[bf]{caption}
+%\usepackage[font=footnotesize]{subcaption}
+
+%%% Overpic
+\usepackage[percent]{overpic}
+
+%%%  Lists
+%\let\labelindent\relax
+\usepackage{enumitem}
+%\setlist{itemsep=0pt,parsep=0pt}             % more compact lists
+
+% *** CITATION PACKAGES ***
+\usepackage[nocompress]{cite}
+
+% *** SUBFIGURE PACKAGES ***
+\usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
+
+% ********************* Commands ***********************
+\newcommand*{\eps}{\vareps}
+\newtheorem{observation}{Observation}
+\newtheorem{problem}{Problem}
+% \newtheorem{definition}{Definition}
+% \newtheorem{lemma}{Lemma}
+% \newtheorem{corollary}{Corollary}
+% \newtheorem{theorem}{Theorem}
+
+\newcommand{\remove}[1]{}
+\newcommand{\edist}[2]{\Arrowvert {#1} - {#2} \Arrowvert}
+
+\newcommand{\stream}{{\cal S}}
+\newcommand{\batch}{\texttt{batch}\xspace}
+\newcommand{\coreset}{\texttt{coreset}}
+\newcommand{\km}{\texttt{$k$-means}\xspace}
+\newcommand{\kmII}{\texttt{$k$-meansII}\xspace}
+\newcommand{\kmpp}{\texttt{$k$-means++}\xspace}
+\newcommand{\skmpp}{\texttt{streamkm++}\xspace}
+\newcommand{\kmhash}{\texttt{$k$-means\#}\xspace}
+\newcommand{\major}{\texttt{major}\xspace}
+\newcommand{\minor}{\texttt{minor}\xspace}
+\newcommand{\prefixsum}{\texttt{prefixsum}\xspace}
+
+\newcommand{\clusterinit}{\texttt{StreamCluster-Init}\xspace}
+\newcommand{\clusterupdate}{\texttt{StreamCluster-Update}\xspace}
+\newcommand{\clusterquery}{\texttt{StreamCluster-Query}\xspace}
+\newcommand{\object}{\mathcal{H}}
+
+\newcommand{\cstree}{\texttt{CT}\xspace}
+\newcommand{\ct}{\texttt{CT}\xspace}
+\newcommand{\ctinit}{\texttt{CT-Init}\xspace}
+\newcommand{\ctupdate}{\texttt{CT-Update}\xspace}
+\newcommand{\ctcoreset}{\texttt{CT-Coreset}\xspace}
+
+\newcommand{\cc}{\texttt{CC}\xspace}
+\newcommand{\cscache}{\texttt{CC}\xspace}
+\newcommand{\cctree}{\texttt{CC}\xspace}
+\newcommand{\ccupdate}{\texttt{CC-Update}\xspace}
+\newcommand{\ccinit}{\texttt{CC-Init}\xspace}
+\newcommand{\cccoreset}{\texttt{CC-Coreset}\xspace}
+
+\newcommand{\rcc}{\texttt{RCC}\xspace}
+\newcommand{\rccinit}{\texttt{RCC-Init}\xspace}
+\newcommand{\rccupdate}{\texttt{RCC-Update}\xspace}
+\newcommand{\rcccoreset}{\texttt{RCC-Coreset}\xspace}
+\newcommand{\rccquery}{\texttt{RCC-Query}\xspace}
+\newcommand{\rccgetbuckets}{\texttt{RCC-Getbuckets}\xspace}
+
+\newcommand{\seqkm}{\texttt{Sequential $k$-means}\xspace}
+\newcommand{\hybrid}{\texttt{OnlineCC}\xspace}
+\newcommand{\hybridinit}{\texttt{\hybrid-Init}\xspace}
+\newcommand{\hybridupdate}{\texttt{\hybrid-Update}\xspace}
+\newcommand{\hybridquery}{\texttt{\hybrid-Query}\xspace}
+
+\newcommand{\etal}{\textit{et al}.~}
+\newcommand{\ie}{\textit{i}.\textit{e}.~}
+\newcommand{\eg}{\textit{e}.\textit{g}.~}
+\newcommand{\edit}[1]{{\color{red}{#1}}}
+
+%%%
+%%%  Spacing hacks
+%%%
+%% could be 4pt, currently using 6pt base
+%\setlength{\textfloatsep}{6pt plus 2.0pt minus 2.0pt}
+%\setlength{\intextsep}{6pt plus 1.0pt minus 2.0pt}
+%\setlength{\floatsep}{6pt plus 1.0pt minus 2.0pt}
+%\setlength{\floatsep}{4pt plus 2.0pt}
+%\setlength{\dbltextfloatsep}{6pt plus 1.0pt minus 2.0pt}
+%\setlength{\dblfloatsep}{6pt plus 1.0pt minus 2.0pt}
+%\setlength{\dblfloatsep}{4pt plus 1.0pt}
+
+%\setlength{\parskip}{0.5pt} 
+%\setlength{\parskip}{0.4em}  %% revert back to original IEEE skip
+%\setlength{\parskip}{0.5em}  
+
+
+%% microtype has to be the last thing before begin doc
+\usepackage{microtype} %% for less ugly linebreaking
+
+
+
+
+% **************** Document Begins ***************
+\begin{document}
+
+% **************** Title *****************
+\title{Streaming $k$-Means Clustering with Fast Queries}
+
+% **************** Authors ***************
+\author{Yu Zhang,
+        Kanat Tangwongsan,
+        Srikanta Tirthapura
+\IEEEcompsocitemizethanks{
+\IEEEcompsocthanksitem Yu Zhang is with the Department of Electrical and Computer Engineering, Iowa State University, Ames, IA, 50011.\protect\\
+E-mail: yuz1988@iastate.edu
+\IEEEcompsocthanksitem Kanat Tangwongsan is with the Compute Science Program, Mahidol University International College, Thailand.\protect\\
+Email: kanat.tan@mahidol.edu
+\IEEEcompsocthanksitem Srikanta Tirthapura is with the Department of Electrical and Computer Engineering, Iowa State University, Ames, IA, 50011.\protect\\
+E-mail: snt@iastate.edu
+}
+%\thanks{Manuscript received ... ; revised ....}
+}
+
+
+% **************** Abstract *******************
+\IEEEtitleabstractindextext{%
+\begin{abstract}
+  We present methods for $k$-means clustering on a stream with a focus on
+  providing fast responses to clustering queries. Compared to the current
+  state-of-the-art, our methods provide substantial improvement in the query
+  time for cluster centers while retaining the desirable properties of provably
+  small approximation error and low space usage.  Our algorithms rely on a novel
+  idea of ``coreset caching'' that systematically reuses coresets (summaries of
+  data) computed for recent queries in answering the current clustering
+  query. We present both theoretical analysis and detailed experiments
+  demonstrating their correctness and efficiency.
+\end{abstract}
+
+
+\begin{IEEEkeywords}
+clustering, data stream, coreset, caching.
+\end{IEEEkeywords}}
+%-----------------------
+
+
+\maketitle
+
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+
+\input{introduction}
+
+\input{prelim}
+
+\input{background}
+
+\input{algorithm}
+
+\input{eval}
+
+\input{concl}
+
+% The Computer Society usually uses the plural form
+\section*{Acknowledgments}
+This work is supported in part by the US National Science Foundation through awards 1527541 and 1632116.
+
+% **************** Bibliography *******************
+%\begin{small}
+\bibliographystyle{IEEEtran}
+  %\balance
+\bibliography{IEEEtran/IEEEabrv,stream-clustering}
+%\end{small}
+
+%\appendices
+%\section{Proof of the First Zonklar Equation}
+%Appendix one text goes here.
+%
+%% you can choose not to have a title for an appendix
+%% if you want by leaving the argument blank
+%\section{}
+%Appendix two text goes here.
+
+
+% ***************** Biography *****************
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/yu.jpg}}]{Yu Zhang}
+Yu Zhang is a Ph.D. student in the Department of Electrical and Computer Engineering at Iowa State University. He received his M.S. in Computer Engineering from University of Central Florida in 2012, and his B.S. in Electrical Engineering from University of Science and Technology of China in 2011. He is interested in data stream mining and algorithm design for machine learning.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/kanat.jpg}}]{Kanat Tangwongsan}
+Kanat Tangwongsan is a computer scientist on the faculty of Mahidol University International College. He received his Ph.D. and B.S. in Computer Science from Carnegie Mellon University in 2010 and 2006. He worked at IBM T.J. Watson Research Center as a research staff member from 2010 to 2015. His current research interests are parallel algorithms design for massive data, both in theory and practice.
+\end{IEEEbiography}
+
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{photos/snt.jpg}}]{Srikanta Tirthapura}
+Srikanta Tirthapura is a Professor in the department of Electrical and Computer Engineering at Iowa State University. He received his Ph.D. in Computer Science from Brown University in 2002, and his B.Tech. in Computer Science and Engineering from IIT Madras in 1996. His research interests are algorithm design for big data, including data stream algorithms and parallel and distributed algorithms. He is a recipient of the IBM Faculty Award, and the Warren Boast Award for excellence in Undergraduate Teaching.
+\end{IEEEbiography}
+
+\end{document}

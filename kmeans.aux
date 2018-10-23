@@ -1,0 +1,249 @@
+\relax 
+\citation{AMR+12,AJM09,GMM+03,SWM11}
+\citation{AMR+12,AJM09}
+\citation{HM04}
+\citation{AV07}
+\citation{AMR+12}
+\citation{AJM09}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}}
+\newlabel{sec:intro}{{1}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Our Contributions}{1}}
+\citation{MacQueen67}
+\citation{Lloyd82}
+\citation{AV07}
+\citation{MacQueen67}
+\citation{MBY+15}
+\citation{KMN+04}
+\citation{ZRL96}
+\citation{AHW+03}
+\citation{GMM+03}
+\citation{AJM09}
+\citation{HM04}
+\citation{BS80}
+\citation{HK07,FL11,FSS13}
+\citation{AMR+12}
+\citation{AV07}
+\citation{AV07}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The time and accuracy of different clustering algorithms. For algorithms other than $\texttt  {CT}\xspace  $, we assume answering queries by using the coreset cache.}}{2}}
+\newlabel{table:summary}{{1}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Related Work}{2}}
+\newlabel{sec:related}{{1.2}{2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Preliminaries and Notation}{2}}
+\newlabel{sec:prelim}{{2}{2}}
+\@writefile{thm}{\contentsline {problem}{{Problem}{1}{$k$-means Clustering}}{2}}
+\@writefile{thm}{\contentsline {theorem}{{Theorem}{1}{Theorem 3.1 in \cite {AV07}}}{2}}
+\newlabel{theo:kmeans++}{{1}{2}}
+\citation{HM04}
+\citation{HM04}
+\citation{HM04}
+\citation{FSS13}
+\citation{FSS13}
+\citation{AMR+12}
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Stream Clustering Driver}}{3}}
+\newlabel{algo:cluster-init}{{1}{3}}
+\newlabel{algo:cluster-update}{{1}{3}}
+\newlabel{algo:cluster-query}{{1}{3}}
+\@writefile{thm}{\contentsline {definition}{{Definition}{1}{$k$-means Coreset}}{3}}
+\newlabel{defn:coreset}{{1}{3}}
+\@writefile{thm}{\contentsline {observation}{{Observation}{1}{\cite {HM04}}}{3}}
+\newlabel{obs:coreset1}{{1}{3}}
+\@writefile{thm}{\contentsline {observation}{{Observation}{2}{\cite {HM04}}}{3}}
+\newlabel{obs:coreset2}{{2}{3}}
+\@writefile{thm}{\contentsline {theorem}{{Theorem}{2}{\cite {FSS13} Corollary $4.5$}}{3}}
+\newlabel{theo:coreset-build}{{2}{3}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Streaming Clustering and Coreset Trees}{3}}
+\newlabel{sec:background}{{3}{3}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Coreset Tree Algorithm}}{3}}
+\newlabel{algo:ctfunctions}{{2}{3}}
+\newlabel{algo:ctinit}{{2}{3}}
+\newlabel{algo:ctupdate}{{2}{3}}
+\newlabel{algo:ctquery}{{2}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Driver Algorithm}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}\texttt  {CT}\xspace  : $r$-way Merging Coreset Tree}{3}}
+\newlabel{sec:cstree}{{3.2}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Illustration of a $3$-way coreset tree (\texttt  {CT}\xspace  ), showing the states after receiving number of base buckets (a) $1$, (b) $4$, (c) $6$, (d) $9$. The notation $[l,r]$ denotes a coreset of all points in buckets number from $l$ to $r$, both endpoints inclusive. The coreset tree consists of coresets represented by ellipses, each is a base bucket (level $0$) or has been formed by merging multiple coresets from lower levels. A coreset becomes inactive when it is merged and represented by a dotted bordered ellipse.}}{4}}
+\newlabel{fig:coreset-tree}{{1}{4}}
+\@writefile{thm}{\contentsline {definition}{{Definition}{2}{Level-$\ell $ Coreset}}{4}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{1}{}}{4}}
+\newlabel{lemma:cstree-level2}{{1}{4}}
+\@writefile{thm}{\contentsline {fact}{{Fact}{1}{}}{4}}
+\newlabel{fact:cstree-fact}{{1}{4}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{2}{}}{4}}
+\newlabel{lemma:cstree-accuracy}{{2}{4}}
+\newlabel{eq:accuracy eq1}{{1}{4}}
+\newlabel{eq:accuracy eq2}{{2}{4}}
+\newlabel{eq:accuracy eq3}{{3}{4}}
+\newlabel{eq:accuracy eq4}{{4}{4}}
+\newlabel{eq:accuracy eq5}{{5}{4}}
+\newlabel{eq:accuracy eq6}{{6}{4}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{3}{}}{4}}
+\newlabel{thm:cstree-time}{{3}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Clustering Algorithms with Fast Queries}{5}}
+\newlabel{sec:algorithm}{{4}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Algorithm $\texttt  {CC}\xspace  $: Coreset Tree with Caching}{5}}
+\newlabel{sec:cctree}{{4.1}{5}}
+\@writefile{thm}{\contentsline {fact}{{Fact}{2}{}}{5}}
+\newlabel{fact:prefixextension}{{2}{5}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{4}{}}{5}}
+\newlabel{lemma:cache correctness}{{4}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Illustration of Algorithm \texttt  {CC}\xspace  , showing the states of coreset tree and cache after batch $1$, $2$, $3$, $4$, $7$, $8$, $15$ and $16$. The notation $[l,r]$ denotes a coreset of all points in buckets $l$ to $r$, both endpoints inclusive. The coreset tree consists of a set of coresets, each of which is a base bucket or has been formed by merging multiple coresets. Whenever a coreset is merged into a another coreset (in the tree) or discarded (in the cache), the coreset is marked with an ``X''. We suppose that a clustering query arrives after seeing each batch, and describe the actions taken to answer this query (1)\nobreakspace  {}if only \texttt  {CT}\xspace  was used, or (2)\nobreakspace  {}if \texttt  {CC}\xspace  was used along with \texttt  {CT}\xspace  .}}{6}}
+\newlabel{fig:algo-cc}{{2}{6}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{5}{}}{6}}
+\newlabel{lemma:cctree-level}{{5}{6}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{6}{}}{6}}
+\newlabel{lemma:cctree-accuracy}{{6}{6}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{7}{}}{6}}
+\newlabel{lemma:cctree-time}{{7}{6}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {3}{\ignorespaces Coreset Tree with Caching}}{7}}
+\newlabel{algo:cctree-functions}{{3}{7}}
+\newlabel{algo:cctree-init}{{3}{7}}
+\newlabel{algo:cctree-update}{{3}{7}}
+\newlabel{algo:cctree-coreset}{{3}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Algorithm $\texttt  {RCC}\xspace  $: Recursive Coreset Cache}{7}}
+\newlabel{algo:rcc-init}{{4}{7}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces $\mathcal  {R}.\texttt  {RCC-Init}\xspace  (\iota )$  }}{7}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{8}{}}{7}}
+\newlabel{lemma:rcc-level}{{8}{7}}
+\newlabel{algo:rcc-update}{{5}{8}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {5}{\ignorespaces $\mathcal  {R}.\texttt  {RCC-Update}\xspace  (b)$ }}{8}}
+\newlabel{algo:rcc-getbuckets}{{6}{8}}
+\newlabel{algo:rcc-coreset}{{6}{8}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {6}{\ignorespaces  $\mathcal  {R}.\texttt  {RCC-Coreset}\xspace  ()$   }}{8}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Possible tradeoffs for the $\texttt  {RCC}\xspace  (\iota )$ algorithm, based on the parameter $\iota $, the nesting depth of the structure. }}{8}}
+\newlabel{table:rcc}{{2}{8}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{9}{}}{8}}
+\newlabel{lemma:rcc-performance}{{9}{8}}
+\citation{MacQueen67}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Illustration of Algorithm \texttt  {OnlineCC}\xspace  .}}{9}}
+\newlabel{fig:algo-onlinecc}{{3}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Online Coreset Cache: a Hybrid of \texttt  {CC}\xspace  and \texttt  {Sequential $k$-means}\xspace  }{9}}
+\newlabel{sec:hybrid}{{4.3}{9}}
+\newlabel{algo:hybrid}{{7}{9}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {7}{\ignorespaces The Online Coreset Cache: A hybrid of \texttt  {CC}\xspace  and \texttt  {Sequential $k$-means}\xspace  algorithms}}{9}}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{10}{}}{9}}
+\newlabel{lemma:ecost}{{10}{9}}
+\citation{Lichman13}
+\citation{Lichman13}
+\citation{BGE+16}
+\citation{BHK+10}
+\citation{MacQueen67}
+\citation{MBY+15}
+\citation{AMR+12}
+\@writefile{thm}{\contentsline {lemma}{{Lemma}{11}{}}{10}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Evaluation}{10}}
+\newlabel{sec:expts}{{5}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Datasets}{10}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces An overview of the datasets used in the experiments.}}{10}}
+\newlabel{table:dataset}{{3}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Experimental Setup and Implementation Details}{10}}
+\citation{AMR+12,AJM09}
+\citation{AMR+12}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Discussion of Experimental Results}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces \texttt  {$k$-means}\xspace  cost vs. number of clusters $k$. The cost is computed at the end of observing all the points. \texttt  {$k$-means}\xspace  cost of \texttt  {Sequential $k$-means}\xspace  on \texttt  {Intrusion}\xspace  dataset is not shown in Figure (c), since it was orders of magnitude larger ($10^4$) than the other algorithms.}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace (\texttt {$k$-means}\xspace cost of \texttt {Sequential $k$-means}\xspace is not shown)}}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{12}}
+\newlabel{fig:cost-versus-k}{{4}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Average update time per point (microseconds) vs. number of clusters $k$. The query interval $q$ is $100$ points.}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{12}}
+\newlabel{fig:update-versus-k}{{5}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Average query time per point (microseconds) vs. number of clusters $k$. The query interval $q$ is $100$ points.}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{12}}
+\newlabel{fig:query-versus-k}{{6}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Average runtime per point (microseconds) vs. number of clusters $k$. The runtime is sum of average update time (per point) and the average query time (per point). The query interval $q$ is $100$ points.}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{12}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{12}}
+\newlabel{fig:total-versus-k}{{7}{12}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Memory cost of algorithms, number of clusters $k$ is set to $30$ .}}{12}}
+\newlabel{table:memory-cost}{{4}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Total time (seconds) vs. query interval $q$. The total time is for the entire dataset overall stream. For every $q$ points, there is a query for the cluster centers. The number of centers $k$ is $30$.}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{13}}
+\newlabel{fig:time-versus-q}{{8}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \texttt  {$k$-means}\xspace  cost vs. bucket size $m$. The cost is computed at the end of observing all the points. The number of clusters $k=30$, query interval $q=100$. }}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{13}}
+\newlabel{fig:cost-versus-m}{{9}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Average update time per point (microseconds) vs. bucket size $m$. The number of clusters $k=30$, query interval $q=100$. }}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{13}}
+\newlabel{fig:update-versus-m}{{10}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Average query time per point (microseconds) vs. bucket size $m$. The number of clusters $k=30$, query interval $q=100$. }}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{13}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{13}}
+\newlabel{fig:query-versus-m}{{11}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Average runtime per point (microseconds) vs. bucket size $m$. The runtime is the sum of update time (per point) and the query time (per point). The number of clusters $k=30$, query interval $q=100$. }}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{14}}
+\newlabel{fig:total-versus-m}{{12}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Update time per point (microseconds) vs. poisson arrival rate $\lambda $. }}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{14}}
+\newlabel{fig:poisson-update}{{13}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Query time per point (microseconds) vs. poisson arrival rate $\lambda $.}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{14}}
+\newlabel{fig:poisson-query}{{14}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Total time per point (microseconds) vs. poisson arrival rate $\lambda $.}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{14}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{14}}
+\newlabel{fig:poisson-total}{{15}{14}}
+\bibstyle{IEEEtran}
+\bibdata{IEEEtran/IEEEabrv,stream-clustering}
+\bibcite{AMR+12}{1}
+\bibcite{AJM09}{2}
+\bibcite{GMM+03}{3}
+\bibcite{SWM11}{4}
+\bibcite{HM04}{5}
+\bibcite{AV07}{6}
+\bibcite{MacQueen67}{7}
+\bibcite{Lloyd82}{8}
+\bibcite{MBY+15}{9}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Total runtime (seconds) vs. switch threshold $\alpha $ in \texttt  {OnlineCC}\xspace  algorithm. The number of clusters $k=30$, query interval $q=100$. The update and query time are both counted for the whole stream instead of per point.}}{15}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {\texttt {Covtype}\xspace }}}{15}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {\texttt {Power}\xspace }}}{15}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {\texttt {Intrusion}\xspace }}}{15}}
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {\texttt {Drift}\xspace }}}{15}}
+\newlabel{fig:time-versus-threshold}{{16}{15}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{15}}
+\newlabel{sec:concl}{{6}{15}}
+\@writefile{toc}{\contentsline {section}{References}{15}}
+\bibcite{KMN+04}{10}
+\bibcite{ZRL96}{11}
+\bibcite{AHW+03}{12}
+\bibcite{BS80}{13}
+\bibcite{HK07}{14}
+\bibcite{FL11}{15}
+\bibcite{FSS13}{16}
+\bibcite{Lichman13}{17}
+\bibcite{BGE+16}{18}
+\bibcite{BHK+10}{19}
+\@writefile{toc}{\contentsline {section}{Biographies}{16}}
+\@writefile{toc}{\contentsline {subsection}{Yu Zhang}{16}}
+\@writefile{toc}{\contentsline {subsection}{Kanat Tangwongsan}{16}}
+\@writefile{toc}{\contentsline {subsection}{Srikanta Tirthapura}{16}}

@@ -1,0 +1,154 @@
+%------------------------------------------
+\IEEEraisesectionheading{\section{Introduction}\label{sec:intro}}
+%------------------------------------------
+\IEEEPARstart{C}{lustering} is a fundamental method for understanding and interpreting data that
+seeks to partition input objects into groups, known as \emph{clusters}, such
+that objects within a cluster are similar to each other, and objects in
+different clusters are not.  A clustering formulation called $k$-means is
+simple, intuitive, and widely used in practice.  Given a set of points $S$ in a
+Euclidean space and a parameter $k$, the objective of $k$-means is to partition
+$S$ into $k$ clusters in a way that minimizes the sum of the squared distance
+from each point to its cluster center.
+
+In many cases, the input data is not available all at once but arrives as a
+continuous, possibly unending, sequence.  This variant, known as \emph{streaming
+$k$-means clustering}, requires an algorithm to maintain enough state to be
+able to incrementally update the clusters as more data arrive.  Furthermore,
+when a query is posed, the algorithm is required to return $k$ cluster centers,
+one for each cluster, for the data observed so far.
+
+Prior work on streaming $k$-means (e.g.~\cite{AMR+12,AJM09,GMM+03,SWM11}) has
+mainly focused on optimizing the memory requirements, leading to algorithms with
+provable approximation quality that only use space polylogarithmic in the input
+stream's size~\cite{AMR+12,AJM09}.  However, these algorithms require an
+expensive computation to answer a query for cluster centers.  This can be a
+serious problem for applications that need answers in (near) real-time, such as
+in network monitoring and sensor data analysis.  Our work aims at improving the
+clustering query-time while keeping other desirable properties of current
+algorithms.
+
+To understand why current solutions to streaming $k$-means clustering have a high query runtime, let us review the
+framework they use. At a high level, an incoming data stream $\stream$ is divided into smaller ``chunks''
+$\stream_1,\stream_2,\ldots,$. Each chunk is summarized into a compact
+representation, known as a ``coreset'' (for example, see~\cite{HM04}). The
+resulting coresets may still not all fit into the memory of the processor.
+Hence, multiple coresets are further merged recursively into higher-level
+coresets, forming a hierarchy of coresets, or a ``coreset tree''.  When a query
+arrives, all active coresets in the coreset tree are merged together, and a
+clustering algorithm such as $\kmpp$~\cite{AV07} is applied on the result,
+outputting $k$ cluster centers. The query time is consequently proportional to
+the number of coresets that need to be merged together. In prior algorithms, the
+total size of all these coresets could be as large as the whole memory itself,
+which causes the query time to often be prohibitively high.
+
+
+\subsection{Our Contributions}
+We present three algorithms (\cc{}, \rcc{}, and \hybrid{}) for
+streaming $k$-means clustering that asymptotically and practically improve upon
+prior algorithms' response time of a query while retaining guarantees on memory
+efficiency and solution quality of the current state-of-the-art.  We provide
+theoretical analysis, as well as extensive empirical evaluation, of the proposed
+algorithms.
+
+At the heart of our algorithms is the idea of ``coreset caching'' that to our
+knowledge, has not been used before in streaming clustering. It works by reusing
+coresets that have been computed during previous (recent) queries to speedup the
+computation of a coreset for the current query. In this way, when a query
+arrives, the algorithm has no need to combine all coresets currently in memory;
+it only needs to merge a coreset from a recent query (stored in the coreset
+cache) along with coresets of points that arrived after this
+query.
+
+%------------------------------------------
+\input{table-cost-summary}
+%------------------------------------------
+
+Our theoretical results are summarized in Table~\ref{table:summary}.
+Throughout, let $n$ denote the number of points observed in the stream so far.
+We measure an algorithm's performance in terms of both running time (further
+separated into query and update) and memory consumption.  The query cost, stated
+in terms of $q$, represents the expected amortized cost per input point assuming
+that the total number of queries does not exceed $n/q$---or that the average
+interval between queries is $\Omega(q)$. The update cost is the average (i.e.,
+amortized) per-point processing cost, taken over the entire stream.  The memory
+cost is expressed in terms of words assuming that each point is $d$-dimensional
+and can be stored in $O(d)$ words.  Furthermore, let $m$ denote a user-defined
+parameter that determines the coreset size ($m$ is set independent of $n$ and is
+often $O(k)$ in practice); $r$ denote a user-defined parameter that sets the
+merge degree of the coreset tree; and $N = n/m$ be the number of ``base
+buckets.''
+
+In terms of accuracy, each of our algorithms provides a provable
+$O(\log k)$-approximation to the optimal $k$-means solution---that is, the
+quality is comparable, up to constants, to what we would obtain if we simply
+stored all the points so far in memory and ran an (expensive) batch $\kmpp$
+algorithm at query time.  Further scrutiny reveals that for the same target
+accuracy (holding constants in the big-$O$ fixed), our simplest algorithm
+``Cached Coreset Tree'' ($\cc$) improves the query runtime of a current
+state-of-the-art, \ct{}\footnote{$\ct$ is essentially the \skmpp
+  algorithm~\cite{AMR+12} and~\cite{AJM09} except it has a more flexible rule
+  for merging coresets.}, by a factor of $O(\log N)$---at the expense of a
+(small) constant factor increase in memory usage.  If more flexibility in
+tradeoffs among the parameters is desired, coreset caching can be applied
+recursively.  Using this scheme, the ``Recursive Cached Coreset Tree'' ($\rcc$)
+algorithm can be configured so that it has a query runtime that is a factor of
+$O(r)$ times faster than \ct, and yields better solution quality
+than \ct{}, at the cost of a small polynomial factor increase in memory.
+
+In practice, a simple sequential streaming clustering algorithm, due to
+MacQueen~\cite{MacQueen67}, is known to be fast but lacks good theoretical
+properties.  We derive an algorithm, called \hybrid{}, that combines ideas from
+\cc and sequential streaming to further enhance clustering query runtime while
+keeping the provable clustering quality of \rcc and \cc.
+
+We also present an extensive empirical study of the proposed algorithms, in
+comparison to the state-of-the-art $k$-means algorithms, both batch and
+streaming.  The results show that our algorithms yield substantial speedups
+(5--100x) in query runtime and total time, and match the accuracy of \skmpp for
+a broad range of datasets and query arrival frequencies.
+
+
+%------------------------------------------
+\subsection{Related Work}
+\label{sec:related}
+% ------------------------------------------
+
+When all input is available at the start of computation (batch setting), Lloyd's
+algorithm~\cite{Lloyd82}, also known as the \km algorithm, is a simple,
+widely-used algorithm.  Although it has no quality guarantees, heuristics such
+as \kmpp~\cite{AV07} can generate a starting configuration such that Llyod's
+algorithm will produce provably-good clusters.
+
+In the streaming setting, \cite{MacQueen67} is the earliest streaming
+$k$-means method, which maintains the current cluster centers and applies one
+iteration of Lloyd's algorithm for every new point received.  Because it is fast
+and simple, this sequential algorithm is commonly used in practice (e.g., Apache Spark
+mllib~\cite{MBY+15}).  However, it cannot provide any guarantees on the
+quality~\cite{KMN+04}.  BIRCH~\cite{ZRL96} is a streaming clustering method
+based on a data structure called the CF Tree; it produces cluster centers
+through agglomerative hierarchical clustering on the leaf nodes of the
+tree. CluStream\cite{AHW+03} constructs ``microclusters'' that summarize subsets
+of the stream, and further applies a weighted \km algorithm on the
+microclusters. STREAMLS~\cite{GMM+03} is a divide-and-conquer method based on
+repeated application of a bicriteria approximation algorithm for clustering. A
+similar divide-and-conquer algorithm based on \kmpp is presented
+in~\cite{AJM09}. Invariably, these methods have high query-processing cost and
+are not suitable for applications that require fast query response.  In
+particular, at the time of query, they require merging multiple data structures,
+followed by an extraction of cluster centers, which is expensive.
+
+Har-Peled and Mazumdar~\cite{HM04} present coresets of size
+$O(k \eps^{-d} \log n)$ for summarizing $n$ points \km, and also show how to
+use the merge-and-reduce technique based on the Bentley-Saxe
+decomposition~\cite{BS80} to derive a small-space streaming algorithm using
+coresets. Further work~\cite{HK07, FL11, FSS13} reduced the size of a \km coreset
+to $O(k/\eps^2)$. A close cousin to ours, \skmpp~\cite{AMR+12}
+(essentially the \ct{} scheme) is a streaming $k$-means clustering algorithm
+that uses the merge-and-reduce technique along with \kmpp to generate a
+coreset. Our work improves on \skmpp w.r.t. query runtime.
+
+\noindent\textbf{Roadmap:} We present preliminaries in Section~\ref{sec:prelim},
+background for streaming clustering in Section~\ref{sec:background} and then the
+algorithms $\cc$, $\rcc$, and $\hybrid$ in Section~\ref{sec:algorithm}, along
+with their proofs of correctness and quality guarantees. We then present
+experimental results in Section~\ref{sec:expts}.

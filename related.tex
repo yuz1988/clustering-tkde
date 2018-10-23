@@ -1,0 +1,70 @@
+\subsection{Related Work}
+\label{sec:related}
+%------------------------------------------
+The literature on $k$-means clustering has a long and rich history.  In the
+\emph{batch} setting (all the input is available at the start of the
+computation), Lloyd's algorithm~\cite{Lloyd82}, also known as \km algorithm, has
+been used for \km clustering for decades and is a simple iterative procedure
+that is widely used in practice. However, it does not have a good (theoretical)
+guarantee on the quality of the clusters. \kmpp~\cite{AV07} suggests a new
+seeding procedure to determine the starting configuration for Lloyd's algorithm
+with a provable guarantee on the quality of the clusters with respect to the
+optimal solution. Bahmani et~al.~propose a parallel algorithm
+\kmII~\cite{BMV+12} that reduces the number of iterations in the initialization
+phase of \kmpp algorithm.
+
+%Streaming
+The earliest streaming clustering method appears in \cite{MacQueen67} , which
+simply applies Lloyd's algorithm for every new point received. Because it is
+fast and easy to implement, this simple algorithm has been widely used in
+practice (e.g., Apache Spark mllib~\cite{MBY+15}). However, it cannot provide
+any good clustering quality guarantees~\cite{KMN+04}. In \cite{AD14}, Ackerman
+and Dasgupta state the limitations of sequential clustering and study the case
+where extra clusters are allowed to improve the quality.  In the past $20$
+years, with a rapid increase in the size of datasets and the rise of database
+technology, many modern clustering methods for data stream operate on the
+assumption that it is impossible to fit the whole data in memory.
+\textit{BIRCH}~\cite{ZRL96} is one of the earliest and well-known clustering
+method for data stream. The \textit{BIRCH} algorithm builds and maintains a
+special data structure called \textit{CF Tree}, and returns cluster centers by
+applying agglomerative hierarchical clustering algorithm on all the leaf nodes
+in the CF Tree. As another well-known stream clustering algorithm,
+\textit{CluStream}\cite{AHW+03} clusters the data stream based on a new concept
+of \textit{microcluster}, which summarizes a set of statistics of the instances
+from the stream. The algorithm returns the cluster centers by applying a
+weighted \km algorithm on the microclusters. \cite{GMM+03} present a
+hierarchical divide-and-conquer method called \textit{STREAMLS}. Their method is
+based on repeated application of a bicriteria approximation algorithm for
+clustering. A similar streaming based on the \kmpp algorithm is presented
+in~\cite{AJM09}. However, these methods have a high cost of query processing,
+and is not suitable for continuous maintenance of clusters in a stream. In
+particular, each time the set of cluster centers has to be returned, it requires
+merging multiple data structures, followed by an extraction of the centers,
+which is expensive. We will provide a more detailed comparison with our work in
+later sections.
+
+%Coreset
+Recently, there has been interest in generating a compact summary, known as a
+\emph{coreset}, of the original data~\cite{AHV04}.  A coreset is a much smaller
+set of points than the original that approximately maintains the properties of
+the original point with respect to a certain problem. For \km, Har-Peled first
+shows the existence of the coreset with size $O(k\epsilon^d \log n)$
+in~\cite{HM04}, where $n$ is the total number of points. \cite{HM04} also put
+forward a stream clustering algorithm using coreset by applying the
+merge-and-reduce technique, which is based on the Bentley-Saxe
+decomposition~\cite{BS80}. In~\cite{HK07}, Har-Peled reduces the size of the
+coreset to $O(k^3/\epsilon^{d+1})$. More recently, Feldman\cite{FL11} provides a
+coreset with size $O(\frac{kd}{\epsilon^6})$.
+
+\skmpp~\cite{AMR+12} is a streaming $k$-means clustering algorithm that is built
+on the \kmpp algorithm to generate coreset. Our work improves on \skmpp in terms
+of speed. There are many other stream clustering algorithms; we refer interested
+readers to~\cite{AMR+12} and the references therein.
+
+%  still a lot of stream clustering algorithms, but will not
+% list all of them here.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "kmeans"
+%%% End:

@@ -1,0 +1,372 @@
+
+\remove{
+The main idea in coreset caching is the following.
+
+%---------------------------------------------
+\subsection{Algorithm Description}
+\label{sec:algorithm}
+%---------------------------------------------
+{\color{red} What is $\beta$, max buckets per level, $m$ size of a coreset.\\}
+
+
+We describe our algorithm for streaming $k$-means clustering. The basic data structure is a ``bucket'' $b$ which is a 4-tuple $(C,l,r,\ell)$, with the following invariant: $C$ is a level $\ell$ coreset of substream $S(l,r)$. Thus each bucket consists of a coreset of a substream of $S$. For bucket $b = (C,l,r,\ell)$, let $C(b)$ denote the coreset in $b$, $\leftep(b)=l$ the left endpoint of $b$, $\rightep(b)=r$ the right endpoint of $b$, and $\level(b) = \ell$ the level of the coreset $C(b)$. The span of the bucket $b$, denoted by $\bspan(b)$, is defined as the interval $[\leftep(b), \rightep(b)]$.\\
+
+The algorithm maintains a data structure $Q$ that consists of sets of buckets $Q_{\ell}$  at different levels $\ell=0,1,2,\ldots$. This data structure has the following invariants. Each bucket $b \in Q_j$ is a level $j$ coreset of a substream of $S$.
+
+A container of coresets $T$ (such as $Q$ and $\cache$) provides the following operation: $\lookup(T, l,r)$, defined as follows. If there is a bucket $b = (C,l,r,\ell)$ within $T$, then return $b$.  Otherwise, return $\emptyset$.
+
+%-------------------
+\begin{itemize}
+\item
+The spans of different buckets in $Q$ are disjoint.
+
+\item
+For each $\ell \ge 0$, the number of buckets in $Q_{\ell}$ cannot exceed $\beta$.
+
+\item
+For each $\ell > 0$, the union of the span of all buckets in $Q_{\ell}$ is a single continuous interval.
+
+\item
+The union of the spans of all buckets in $Q$ equals the interval $[1,t]$.
+\end{itemize}
+%---------------
+
+The algorithm also maintains an additional structure, a set of buckets, $\cache$ that we call the ``coreset-cache''.  {\color{red} Say more about the cache.}
+
+\remove{
+%---------------------------------------------
+\begin{definition}[Major and Minor]
+\label{defn:maj-min}
+For positive integer $n > 0$, consider the unique decomposition of $n$ into a sum of powers of $2$: 
+$n = \sum_{i=0}^j2^{\alpha_i}$, where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\geq 0$.  
+Let $\minor(n) = 2^{\alpha_0}$, the smallest term in the decomposition. Let $\major(n) = n - \minor(n)$. Note that when $n$ is a power of $2$, $\major(n) = 0$.
+\end{definition}
+%---------------------------------------------
+}
+
+%---------------------
+\begin{algorithm}
+\label{algo:fkm-init}
+\DontPrintSemicolon
+\caption{Initialization: Initialize Data Structures}
+$Q \gets \emptyset$\;
+$\cache \gets \emptyset$\;
+\end{algorithm}
+%------------------
+
+%---------------------
+\begin{algorithm}
+\label{algo:fkm-process}
+\DontPrintSemicolon
+\caption{Update($B_n$): Update Data structures at Timestep $n$.}
+\KwIn{Batch $B_n$}
+\KwOut{$k$-means cluster centers of $S(n)$}
+
+Add bucket $(B_n, n, n, 0)$ to $Q$\;
+
+$j \leftarrow 0$\;
+
+\While{$|Q_j| \ge r$}
+{
+  $b_1 \gets \bunion(Q_j)$ \;
+  $b_2 \gets (\coreset\left(k, \eps, C(b_1) \right), \leftep(b_1), \rightep(b_1), 1+ \level(b_1))$\;
+  Add bucket $b_2$ to $Q_{j+1}$ \;
+  Set $Q_j$ to $\emptyset$\; 
+  $j \gets (j+1)$ \;
+}
+
+
+$n_1 \gets \major(n)$ and $n_2 \gets \minor(n)$\;
+Let $n_2=\beta r^{\alpha}$, where $\alpha, \beta\in Z^+$ and $\beta<r$ \;
+
+$l \gets n_1+1$ \;
+$a \gets \emptyset$ \;
+
+\For{$i=1$ \emph{\KwTo} $\beta$}
+{
+	$a \gets a \cup \lookup(Q, l, l+r^{\alpha}-1)$ \;
+	$l \gets l+r^{\alpha}$\;
+} 
+
+
+\eIf {$n_1$ is $0$}
+{
+	$C_n \gets a$\;
+}
+{
+	$b \gets \lookup(\cache, 1, n_1)$ \;
+	$C_n \gets \coreset(k, \eps, a \cup b)$\;
+}
+
+\If{$n$ is divisible by $r$} 
+{
+From $\cache$, remove all buckets $b'$  such that $\rightep(b') \notin \partsum(n)$\;
+
+Add $\left(C_n, 1, n, 1 + \max\{\level(a), \level(b)\} \right)$ to $\cache$\;
+}
+
+\Return $\kmpp(k, a \cup b)$\;
+\end{algorithm}
+%---------------------
+
+
+%---------------------------------------------------------
+\subsection{Correctness Proof and Analysis}
+%---------------------------------------------------------
+
+%---------------------------------------------------------
+With the level of a coreset is known, the coreset approximation factor can be derived by the following lemma: \\
+\begin{lemma}
+\label{lemma:level-accuracy}
+For a point set $P$ and integer $\ell \ge 0$, if $C = \coreset(k, \eps, \ell, P)$, then $C = \coreset(k, \eps', P)$ where $\eps' = \left(1+\eps \right)^{\ell} - 1$.
+%For $i=0 \ldots \ell$, we have $C_i = \coreset(k, (1+epsilon)^\ell_i-1, \ell_i)$.
+\end{lemma}
+
+\begin{proof}
+Let ${\cal P}(\ell)$ be the proposition: For any point set $P$, if $C = \coreset(k, \eps, \ell, P)$, then $C = \coreset(k, \eps', P)$ where $\eps' = \left(1+\eps \right)^{\ell} - 1$. We prove this lemma by induction on $\ell$. For the base case, consider $\ell=0$. By definition, $\coreset(k,\eps, 0, P) = P$, and $\coreset(k, 0, P) = P$, proving the base case.\\
+
+Consider integer $L > 0$. Suppose that for each positive integer $\ell < L$,  ${\cal P}(\ell)$ was true. The task is to prove ${\cal P}(L)$. Suppose $C = \coreset(k, \eps, L, P)$. Then there must be an arbitrary partition of $P$ into sets $P_1, P_2, \ldots, P_q$ such that $\cup_{i=1}^q P_i = P$. For $i=1\ldots q$, let $C_i = \coreset(k, \eps, \ell_i, P_i)$ for $\ell_i < L$. Then $C$ must be of the form $\coreset(k, \eps, \cup_{i=1}^q C_i)$. \\
+
+By the inductive hypothesis, it must be true that $C_i=\coreset(k, \eps_i, P_i)$ where $\eps_i = \left(1+\eps \right)^{\ell_i} - 1$. By the definition of a coreset and using $\ell_i \le (L-1)$, it is also true that $C_i = \coreset(k, \eps'', P_i)$ where $\eps'' = \left(1+\eps \right)^{(L-1)} - 1$.  Let $C' = \cup_{i=1}^q C_i$.  From Observation~\ref{obs:coreset1}, and using $P = \cup_{i=1}^q P_i$, it must be true that $C'= \coreset(k, \eps'', P)$. Since $C=\coreset(k,\eps,C')$ and using Observation~\ref{obs:coreset2}, we get  $C=\coreset(k, \gamma, P)$ where $\gamma=(1+\eps)(1+\eps'')-1$. Simplifying, we get $\gamma=(1+\eps)(1+ \left(1+\eps \right)^{(L-1)} - 1)-1 = \left(1+\eps \right )^L - 1$. This proves the inductive case ${\cal P}(L)$, completing the proof of the lemma.
+\end{proof}
+%---------------------------------------------------------
+
+%-------------------
+\begin{lemma}
+\label{lemma:maxlevel at coreset-tree}
+For each timestep $n$, the coreset in the coreset tree $Q$ is at maximum level $\left\lfloor \log n/\log r \right\rfloor$ where $r$ is the merge degree of $Q$.
+\end{lemma}
+%-------------------
+\begin{proof}
+We first note that for any level $\ell \ge 0$, there are no more than $r$ buckets at level $\ell$ within $Q$; if there were more than $r$ buckets, they will be merged into a single bucket at level $\ell+1$. Next, in order to get a single bucket at level $\ell$, it is necessary to merge $r$ buckets at level $(\ell-1)$, $r^2$ buckets at level $(\ell-2)$, and so on. So for a single bucket at level $\ell$, it requires $r^{\ell}$ level $0$ buckets to merge. Suppose $\ell_{max}$ is the maximum level of a bucket within $Q$. Since the coreset tree has $n$ level $0$ buckets received, it must be true that $r^{\ell_{max}} \le n$, which leads to $\ell_{max} = \left\lfloor \log n/\log r \right\rfloor$.
+\end{proof}
+%-------------------
+
+%-------------------
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.4\textwidth]{./figures/tree.jpg}
+  \caption{coreset merge from coreset tree and cache (timestep=$368$, merge degree $r=5$), 
+  inside each node shows the left to right endpoint batch of the bucket, 
+  above each node shows the number in $5$-nary format}
+  \label{fig:coreset merge}
+\end{figure*}
+%-------------------
+
+%-------------------
+\begin{lemma}
+\label{lemma:maxlevel at cache}
+At the end of each timestep $n$, the coreset in the $\cache$ is at maximum level $2 \cdot \left\lfloor \log n/\log r \right\rfloor$.
+\end{lemma}
+%---------------------------------------------------------
+
+\begin{proof}
+Let us expand $n$ as an $r$-ary number.
+
+Refer to the process of Algorithm~\ref{algo:fkm-process}, if $\major(n)$ is $0$, the new coreset $C_n$ is directly constructed by a copy of the coreset in $Q$. Based on the Lemma~\ref{lemma:maxlevel at coreset-tree}, the new coreset is at maximum level $\left\lfloor \log n/\log r \right\rfloor$. \\
+
+When $\major(n)$ is not $0$, consider $n$ in $r$ radix base format: $n=\sum_{i=0}^j\beta_ir^{\alpha_i}$, where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\ge 0$. Algorithm~\ref{algo:fkm-process} constructs coreset $C_n$ by merging a bucket $b_{cache}$ from $\cache$ which contains the coreset of batches $\left[ 1, \sum_{i=1}^j\beta_ir^{\alpha_i} \right]$, and another bucket $b_Q$ from the coreset tree $Q$ which contains the coreset of batches $\left[ 1+\sum_{i=1}^j\beta_ir^{\alpha_i}, n \right]$. 
+See Figure~\ref{fig:coreset merge} as an example, which shows the history of constructing the new coreset $C_n$ at timestep $368$. For each internal node of the merge tree, the left child is the bucket from the $\cache$ and the right child is the bucket from coreset tree.  
+The left most child contains the coreset of batches $\left[1, \beta_jr^{\alpha_j}\right]$ which is at level $\alpha_j$. Starting from the left most child, as each merge increments the coreset level by $1$ and the total number of merges equals $j$, we can derive the level of coreset $C_n$ by $\left(j+\alpha_j\right)$. With $j \le \alpha_j \le \left\lfloor \log n/\log r \right\rfloor$, the level of coreset $C_n$ at maximum level $2 \cdot \left\lfloor \log n/\log r \right\rfloor$. \\
+
+So at each timestep $n$, the new coreset stored in the $\cache$ is at at maximum level $2 \cdot \left\lfloor \log n/\log r \right\rfloor$, which leads to all the coresets in the $\cache$ is at maximum level $2 \cdot \left\lfloor \log n/\log r \right\rfloor$.
+\end{proof}
+%---------------------------------------------------------
+
+
+\begin{lemma}
+\label{lemma:final accuracy}
+At the end of each time step $n$, if $\eps=\tilde{c}\cdot\frac{\log r}{2\log n}$ for some constant $\tilde{c}<\ln 2$, 
+then Algorithm~\ref{algo:fkm-process} returns a set of $k$ centers $C$ such that 
+$E\left[\phi_C(S(n))\right] \le 16(\ln k+2) \cdot \phi_{OPT}(S(n))$.
+\end{lemma}
+%-------------------
+\begin{proof}
+At time step $n$, based on the Lemma~\ref{lemma:maxlevel at cache}, the coreset $C_n$ is at level no greater than 
+$2 \left\lfloor\log n/\log r \right\rfloor$. 
+So using Lemma~\ref{lemma:level-accuracy}, $C_n$ is an $\eps'$-coreset for $S(n)$ where 
+
+\[ \begin{split} 
+\eps' &= \left[ \left(1 + \tilde{c}\cdot\frac{\log r}{2\log n}\right)^{\frac{2\log n}{\log r}}-1 \right] \\
+&\le \left[ e^{\left(\tilde{c}\cdot \frac{\log r}{2\log n}\right)\cdot \frac{2\log n}{\log r}}-1 \right] = e^{\tilde{c}}-1 < 1
+\end{split} 
+\]
+
+$S(n)$ is the received point set till time step $n$ and we define $O1$ is the set of $k$ centers which achieves optimal $\km$ clustering cost for $S(n)$. From the definition of coreset, 
+\begin{equation}
+\label{eq:final accuracy eq1}
+\phi_{O1}(C_n) \le (1+\eps')\phi_{O1}(S(n)) \le 2\phi_{O1}(S(n))
+\end{equation}
+\\
+
+Let $O2$ be the set of $k$ centers which achieves optimal $\km$ clustering cost for $C_n$. $C$ is the final $k$ centers generated by running $\kmpp$ $C_n$. Using Theorem~\ref{theo:kmeans++} and using $\phi_{O2}(C_n) \le \phi_{O1}(C_n)$, we have 
+\begin{equation}
+\label{eq:final accuracy eq2}
+E\left[ \phi_C(C_n) \right] \le 8(\ln k+2)\cdot\phi_{O2}(C_n) \le 8(\ln k+2)\cdot\phi_{O1}(C_n)
+\end{equation}
+Using Equation~\ref{eq:final accuracy eq1} and \ref{eq:final accuracy eq2} we get $E\left[ \phi_C(C_n) \right] \le 16(\ln k+2)\cdot\phi_{O1}(S(n))$.
+\end{proof}
+%-------------------
+
+
+\begin{lemma}
+The space complexity of Algorithm~\ref{algo:fkm-process} is $O\left(\frac{kdr\log^7n}{\log^7r}\right)$ words. 
+\end{lemma}
+%-------------------
+\begin{proof}
+Using the Theorem~\ref{theo:coreset build}, the capacity of a bucket $m=O\left(\frac{kd}{\eps^6}\right)$. Based on Lemma~\ref{lemma:final accuracy}, we have set $\eps=\tilde{c}\cdot\frac{\log r}{2\log n}$ where $\tilde{c}$ is a constant. So the bucket size $m$ is $O\left(\frac{kd\log^6n}{\log^6r}\right)$. 
+At each time step $n$, from Lemma~\ref{lemma:maxlevel at coreset-tree} the maximum level of a coreset in the coreset tree is $\left\lfloor\log n/\log r\right\rfloor$ and each level has no more than $r$ buckets, so the coreset tree $Q$ has $O\left(\frac{r \log n}{\log r}\right)$ buckets. The space complexity of $Q$ is $O\left(\frac{m r \log n}{\log r}\right)$ words.
+For the space complexity of the $\cache$, consider at the end of each time step, we only keep the bucket $b'$ such that $\rightep(b') \in \partsum(n)$. 
+As the number of partsums of a number $n$ is $\left\lceil \log n/\log r \right\rceil$, the number of buckets in the $\cache$ is always $O\left(\log n/\log r \right)$. So the space complexity of the $\cache$ is $O\left(\frac{m \log n}{\log r}\right)$ words.
+Thus, the total space complexity of Algorithm~\ref{algo:fkm-process} is $O\left(\frac{kdr\log^7n}{\log^7r}\right)$.
+\end{proof}
+%-------------------
+
+
+%-------------------
+\begin{lemma}
+The amortized time per-point to update the coreset tree $Q$ over a sequence of $n$ input batches is $O(kd)$.
+\end{lemma}
+%-------------------
+\begin{proof}
+For any level $\ell$ in $Q$, there are at most $r$ buckets. We generate a level $1$ bucket after receiving every $r$ input batches, and generate a level $2$ bucket after receiving every $r^2$ input batches, and so one. So with every $r^i$ input batches, a new bucket containing a level $i$ coreset is constructed. 
+Using Theorem~\ref{theo:coreset build}, the time cost of merging $r$ buckets with total of $rm$ points into a new bucket at a higher level is $O(kdrm+\log^2(rm)+dk)$. 
+So the amortized time for each point to update $Q$ is
+\[ \begin{split} 
+&\sum_{\ell=1}^{\left\lceil \log_r n \right\rceil}\frac{1}{r^{\ell}m}O(kdrm+\log^2(rm)+dk) \\
+&=O\left(\frac{kdrm+\log^2(rm)+dk}{m(r-1)}\right) \\
+&=O(kd)
+\end{split}
+\]
+So the lemma is proved.
+\end{proof}
+%-------------------
+
+
+%-------------------
+\begin{lemma}
+The amortized time per-point of Algorithm~\ref{algo:fkm-process} to return $k$ centers is $O(kdr)$.
+\end{lemma}
+%-------------------
+\begin{proof}
+To compute the final $k$ centers in each batch, we first generate two multisets: a set of buckets $b_Q$ from the coreset tree $Q$ and a bucket $b_{cache}$ from the $\cache$. As the merge degree is $r$, the number of buckets in $b_Q$ is at most $(r-1)$, so $b_Q$ contains at most $m(r-1)$ points. On the other hand, $b_{cache}$ contains $m$ points. To merge the multiset $b_Q$ and $b_{cache}$ into one bucket, using the Theorem~\ref{theo:coreset build}, the time cost is 
+$O(kdmr+\log^2rm + kd)=O(kdmr)$. 
+Note that we only insert new $\coreset$ in the cache once for every $r$ batches when the number of batches is divisible by $r$. So the amortized time to compute new $\coreset$ is $O(kdm)$.
+Then we run the $\kmpp$ on the union set of $b_Q \cup b_{coreset}$, as the union set contains $O(mr)$ points, this spends time $O(kdmr)$. 
+So the total time to return the $k$ centers is $O(kdmr)$ for each batch, as each batch contains $O(m)$ points, the amortized time complexity for each point is $O(kdr)$.
+\end{proof}
+%-------------------
+
+
+%-------------------
+\begin{lemma}
+At timestep $n$, the amortized time per-point of $\skmpp$ to return $k$ centers is $O(kdr\log_r n)$.
+\end{lemma}
+%-------------------
+\begin{proof}
+At timestep $n$, the maximum level of coreset tree $Q$ is $\left\lfloor \log_r n \right\rfloor$ and each level has at most $r$ buckets. So in total there are $r\cdot \log_r n$ buckets in $Q$. 
+We run the $\kmpp$ on the union of all the coresets in $Q$, which spends time $O(kdmr\log_r n)$. The amortized time per-point is $O(kdr\log_r n)$.
+\end{proof}
+%-------------------
+
+%---------------------------------------------------------
+\subsection{Comparison with \skmpp}
+%---------------------------------------------------------
+In \skmpp\cite{AMR+12}, coresets are constructed using the \kmpp algorithm. Suppose that a coreset size of $m$ was used (the paper says $m=200k$ is sufficient). The amortized cost of processing a batch of $m$ points using \skmpp is $O(dm^2)$, and the amortized per-item processing cost is $O(dm)$. In contrast, the cost of answering a query is $O(dm^2 \log(n/m) + dkm)$. If a query was answered after each input point (continuous maintenance), the cost of processing a query dominates the cost of processing a point. 
+
+
+\remove{
+
+Let $S$ be the set of all points observed till the current time.
+%-------------------
+\begin{lemma}
+The centers returned by Algorithm Cluster-Centers is an $O(\log k)$ approximation to the optimal clustering of $S$.
+\end{lemma}
+%-------------------
+
+
+
+\subsection{Faster Algorithm Using Coreset Caching}
+
+(intuition idea, decompose each number into two part, and store the major part in the cache for future use.)
+
+Before stepping into our algorithm to answer the query, we first introduce some notations and definitions.
+
+\begin{definition}[Major and Minor]
+\label{defn: major&minor}
+Given a positive integer $n\in Z^+$, decompose $n$ into a sum of powers of $2$: 
+\[
+n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_0} = \sum_{i=0}^j2^{\alpha_i}
+\]
+where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\geq 0$. Note that for any positive integer, this decomposition is unique.
+Define the function $minor(n) = 2^{\alpha_0}$ which is the least significant term in the decomposition expression.
+We also define $major(n) = n - minor(n)$. When $n$ is the power of $2$, $major(n) = 0$. Otherwise, $major(n) = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_1}$.
+\end{definition}
+
+A partial sum of a series is the sum of a finite number of consecutive terms beginning with the first term. Based on the decomposition above, we have a series $S = \{2^{\alpha_j}, 2^{\alpha_{j-1}}, \ldots, 2^{\alpha_0}\}$, define the partial sum set of $n$ as the union of all the partial sums of series $S$, except number $n$ itself. The formal definition is as follows:
+
+\begin{definition}[Partial Sum Set]
+\label{defn: partial sum set}
+$\forall n\in Z^+$, decompose $n$ into a sum of powers of $2$:
+\[
+n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_0} = \sum_{i=0}^j2^{\alpha_i}
+\]
+where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\geq 0$. 
+Define set $S = \{2^{\alpha_j}, 2^{\alpha_{j-1}}, \ldots, 2^{\alpha_0}\}$ and $s_k$ represents sum of the first $k$ terms of set $S$ except $n$ itself, $s_k = \sum_{i=j-k}^j2^{\alpha_i}$, where $0 \leq k \leq j-1$. We define the partial sum set $partsum(n) = \bigcup_{k=0}^{j-1}s_k$. Note when $n$ is power of $2$, $partsum(n) = \emptyset$.
+\end{definition}
+
+The formal algorithm is as follows:
+\newline
+
+%----------------------
+\begin{algorithm}
+\caption{\sf At time $n$, answer a Query for cluster centers with caching}
+\KwIn{Coreset Cache $L$}
+\KwOut{$k$ cluster centers of stream $S_n$}
+\BlankLine
+
+$Q \leftarrow$ retrieve the multiset $Q_{minor(n)}$ in the updated coreset tree \;
+
+\eIf {$major(n)=0$} {     
+	$C_n \leftarrow Q$\;
+} {
+	$R \leftarrow$ retrieve coreset $major(n)$ from the cache $L$\;
+	$C_n \leftarrow Merge(Q, R)$\;
+}
+
+Remove all coresets $\notin partsum(n)$ in $L$\;
+
+Add $C_n$ to cache $L$\;
+
+Return $k$-means++$(k, C_n)$\;
+\end{algorithm}
+%------------------------------------------------------------------------------------------------------
+
+\textbf{Correctness}
+
+\begin{lemma}
+$\forall n\in Z^+$, $partsum(n)$ is always available in the cache $L$ at the beginning time of $n$.
+\begin{proof}
+We use mathematical induction in the proof.
+
+$\textbf{Base case:}$ 
+When $n=1$ and $2$, as these two numbers are powers of 2, so both of their $partsums$ are empty sets, we keep $1$ and $2$ in the cache.
+At the beginning time of $n=3$, $partsum(3)=\{2\}$ and $2$ is in the cache.
+
+$\textbf{Inductive step:}$
+Suppose at beginning time of $n$, the $partsum(n)$ is in the cache. Based on the algorithm, at the beginning time of $(n+1)$, cache contains $partsum(n)$ and $n$. We claim $partsum(n+1) \subseteq partsum(n)\bigcup \{n\}$.
+
+If $n$ is even, it is trivial as in binary format, the only bit changed from $n$ to $n+1$ is the last bit flips from $0$ to $1$, so $partsum(n+1) = partsum(n)\bigcup \{n\}$.
+
+If $n$ is odd, there are two cases to consider.
+When $n+1$ is power of $2$, the $partsum$ is empty set and $n+1$ is the only point in the cache at the end time of $n+1$. 
+When $n+1$ is not power of 2, there must exist at least one $0$ bit in the binary format of $n$. $n+1$ will flip a streak of $1$ bits starting from the least significant bit, until it hits the first $0$ bit, which turns it into $1$. We refer the weight of the first $0$ bit in $n$ as $2^k$, so $n$ can be expressed as $n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_m} + 2^{\alpha_{m-1}} + \cdots + 2^{\alpha_0}$, where the bit $\alpha_m$ is the least significant bit that greater than $k$, $\alpha_{m-1} < k < \alpha_{m}$. Correspondingly, $n+1 = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_m} + 2^k$. Comparing with $n$, $\alpha_j, \alpha_{j-1}, \cdots \alpha_m$ are unchanged, thus $partsum(n+1) \subset partsum(n)$. So in both cases, $partsum(n+1)$ is in the cache $L$ at the beginning time of $n+1$.
+\end{proof}
+\end{lemma}
+Based on the lemma, when $n$ is not power of $2$, we have $major(n) \in partsum(n)$, so we can always retrieve coreset $major(n)$ from the cache. When $n$ is power of $2$, we directly retrieve the only coreset in the coreset tree. 
+
+%------------------------------------------------------------------------------------------------------
+
+\textbf{Time Complexity}
+}
+}

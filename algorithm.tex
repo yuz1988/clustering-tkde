@@ -1,0 +1,66 @@
+%--------------------------------------------------------------------------------------------------
+\section{Clustering Algorithms with Fast Queries}
+\label{sec:algorithm}
+
+\newcommand{\leftep}{{\tt left}}
+\newcommand{\rightep}{{\tt right}}
+\newcommand{\level}{{\tt level}}
+\newcommand{\cache}{\texttt{cache}\xspace}
+\newcommand{\bspan}{{\tt span}}
+\newcommand{\lookup}{{\tt lookup}}
+\newcommand{\bunion}{{\tt union}}
+\newcommand{\bweight}{{\tt weight}}
+\newcommand{\epoch}{{\tt epoch}}
+
+%--------------------------------------------------------------------------------------------------
+
+% In this section we present methods for streaming clustering with a focus on query time. We begin with explaining an algorithm $\ct$ from prior work, and present our ideas while building on this. We suppose that there is one query for every $q$ data points.
+
+This section describes algorithms for streaming clustering with an emphasis on
+query time. 
+%The first algorithm \cctree improves upon \ct from prior work by
+%.... \textbf{XXX - write a quick summary of the algo}
+
+%\input{algo-driver}
+%\input{cstree}
+\input{cctree}
+\input{reccache}
+\input{hybrid}
+
+\remove{
+%---------------------
+\begin{algorithm}
+\label{algo:cluster}
+\DontPrintSemicolon
+\caption{{\tt StreamCluster}($\mathcal{D}, m$)}
+\tcc{Framework for stream clustering}
+\tcc{$\mathcal{D}$ is the clustering data structure, and $m$ is the desired size of a coreset.}
+
+{\bf Init.}
+$n \gets 0$\;
+$\mathcal{D}.Init()$\;
+
+$C \gets \emptyset$\;
+
+\tcp{Insert points into $\mathcal{D}$ in batches of size $m$}
+\If{point $p$ arrives}
+{
+  $n \gets (n+1)$\;
+  Add $p$ to $C$\;
+  
+  \If{$(|C| = m)$}
+  {
+     $\mathcal{D}$.Update($C,n/m$)\;
+     $C \gets \emptyset$\;
+  }
+}
+
+\If{a clustering query arrives}{Return $\mathcal{D}$.Query()\;}
+\end{algorithm}
+%---------------------
+}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "kmeans"
+%%% End:

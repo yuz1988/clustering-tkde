@@ -1,0 +1,32 @@
+\subsection{Binary Coreset Tree}
+Instead of using the naive aggregation method above, we design an algorithm reducing the time cost of aggregation with the expense of additional memory space. Our intuitive idea is to store the coresets aggregation result of previous rounds in the coreset cache $L$, then use the stored aggregation coresets to quickly calculate the new round coreset. We will show that by having very limited size of cache, we could achieve exactly one aggregation to generate the coreset, other than amortized $O(logn)$ in previous method.
+
+\begin{algorithm}
+\caption{{\sf Coreset Aggregation}}
+\KwIn{time $n$; buffers $M_0, M_1, M_2, ... M_r$; coreset cache $L$}
+\KwOut{coreset of current timeslot $C_n$}
+\BlankLine
+
+Decompose $n$ into the sum of powers of 2, $ n = 2^{a_1} + 2^{a_2} ... + 2^{a_j} $ with $a_1 > a_2 > ... > a_j$. Note this decomposition is unique\;
+$Q \leftarrow$ retrieve $M_{a_j}$\;
+$n' \leftarrow n - 2^{a_j} $\;
+
+\eIf {$n'=0$} {     
+	$C_n \leftarrow Q$\;
+} {
+	$C_{n'} \leftarrow$ retrieve from $L$\;
+	$C_n \leftarrow Merge(Q, C'_n)$\;
+
+}
+
+\tcc{\qquad \qquad \qquad \qquad Add to cache}
+\If {$n$ is even} {
+	Add $C_n$ to $L$\;
+}
+
+\tcc{\qquad \qquad \qquad \qquad Delete from cache}
+\If {$a_{j-1}-1=a_j$} {
+	Remove $C_{n'}$ from $L$\;
+}
+
+\end{algorithm}

@@ -1,0 +1,53 @@
+%--------------------------------------------------------------------------------------------------
+\section{Cache Size}
+\label{sec:cache size}
+%--------------------------------------------------------------------------------------------------
+
+\subsection{prefix numbers}
+
+Before stepping into our algorithm to answer the query, we first introduce some notations and definitions.
+
+\begin{definition}[Major and Minor]
+\label{defn: major&minor}
+Given a positive integer $n\in Z^+$, decompose $n$ into a sum of powers of $2$: 
+\[
+n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_0} = \sum_{i=0}^j2^{\alpha_i}
+\]
+where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\geq 0$. Note that for any positive integer, this decomposition is unique.
+Define the function $minor(n) = 2^{\alpha_0}$ which is the least significant term in the decomposition expression.
+We also define $major(n) = n - minor(n)$. When $n$ is the power of $2$, $major(n) = 0$. Otherwise, $major(n) = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_1}$.
+\end{definition}
+
+A partial sum of a series is the sum of a finite number of consecutive terms beginning with the first term. Based on the decomposition above, we have a series $S = \{2^{\alpha_j}, 2^{\alpha_{j-1}}, \ldots, 2^{\alpha_0}\}$, define the partial sum set of $n$ as the union of all the partial sums of series $S$, except number $n$ itself. The formal definition is as follows:
+
+\begin{definition}[Partial Sum Set]
+\label{defn: partial sum set}
+$\forall n\in Z^+$, decompose $n$ into a sum of powers of $2$:
+\[
+n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_0} = \sum_{i=0}^j2^{\alpha_i}
+\]
+where $\alpha_j>\alpha_{j-1}>\cdots>\alpha_0\geq 0$. 
+Define set $S = \{2^{\alpha_j}, 2^{\alpha_{j-1}}, \ldots, 2^{\alpha_0}\}$ and $s_k$ represents sum of the first $k$ terms of set $S$ except $n$ itself, $s_k = \sum_{i=j-k}^j2^{\alpha_i}$, where $0 \leq k \leq j-1$. We define the partial sum set $partsum(n) = \bigcup_{k=0}^{j-1}s_k$. Note when $n$ is power of $2$, $partsum(n) = \emptyset$.
+\end{definition}
+
+
+\begin{lemma}
+$\forall n\in Z^+$, $partsum(n)$ is always available in the cache $L$ at the beginning time of $n$.
+\begin{proof}
+We use mathematical induction in the proof.
+
+$\textbf{Base case:}$ 
+When $n=1$ and $2$, as these two numbers are powers of 2, so both of their $partsums$ are empty sets, we keep $1$ and $2$ in the cache.
+At the beginning time of $n=3$, $partsum(3)=\{2\}$ and $2$ is in the cache.
+
+$\textbf{Inductive step:}$
+Suppose at beginning time of $n$, the $partsum(n)$ is in the cache. Based on the algorithm, at the beginning time of $(n+1)$, cache contains $partsum(n)$ and $n$. We claim $partsum(n+1) \subseteq partsum(n)\bigcup \{n\}$.
+
+If $n$ is even, it is trivial as in binary format, the only bit changed from $n$ to $n+1$ is the last bit flips from $0$ to $1$, so $partsum(n+1) = partsum(n)\bigcup \{n\}$.
+
+If $n$ is odd, there are two cases to consider.
+When $n+1$ is power of $2$, the $partsum$ is empty set and $n+1$ is the only element in the cache at the end time of $n+1$. 
+When $n+1$ is not power of 2, there must exist at least one $0$ bit in the binary format of $n$. $n+1$ will flip a streak of $1$ bits starting from the least significant bit, until it hits the first $0$ bit, which turns it into $1$. We refer the weight of the first $0$ bit in $n$ as $2^k$, so $n$ can be expressed as $n = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_m} + 2^{\alpha_{m-1}} + \cdots + 2^{\alpha_0}$, where the bit $\alpha_m$ is the least significant bit that greater than $k$, $\alpha_{m-1} < k < \alpha_{m}$. Correspondingly, $n+1 = 2^{\alpha_j}+2^{\alpha_{j-1}}+ \cdots + 2^{\alpha_m} + 2^k$. Comparing with $n$, $\alpha_j, \alpha_{j-1}, \cdots \alpha_m$ are unchanged, thus $partsum(n+1) \subset partsum(n)$. So in both cases, $partsum(n+1)$ is in the cache $L$ at the beginning time of $n+1$.
+\end{proof}
+\end{lemma}
+

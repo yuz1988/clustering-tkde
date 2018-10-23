@@ -1,0 +1,38 @@
+1. Improved use of "coreset cache" by "caching" only needed in the query process 
+We update the "coreset cache" in the query process instead of in the update process. Comparing to the conference version, this change makes the update upon receiving each point faster. Now the update process of algorithm CC (coreset cache) is same as the non-caching algorithm CT (coreset tree).
+
+More importantly, our 'coreset caching' mechanism is now working flexibly with the user queries, that's because the cache is only updated on demand: when queries are frequent, our cache updates frequently also which can provide faster speed queries. Otherwise, the query method just retreats back to the CT algorithm which doesn't use caching. The algorithm implementations in the experiments is also modified with the new revised caching mechanism.
+
+In the conference version, as a sequence, the update behavior of our caching algorithms are better. For example, Figure 6 in the conference version shows the update time per batch versus the number of cluster centers k. The CC algorithm (with 'coreset caching') uses 30%~50% more time than StreamKM++ algorithm (without 'coreset caching'), due to the runtime cost on updating the cache. While in the current version of manuscript, algorithm CC and StreamKM++ uses exactly the same update process. The experiment result (shown in Figure 5 as bar plot) reveals the update time of Algorithms CC and StreamKM++ are similar.
+
+The case of infrequent queries is not well addressed by the conference version. In the conference version, Figure 9 shows the total runtime for the whole data stream versus the query interval. When the query interval value q increases, queries become infrequent. We observe that when q increases over 500 points, algorithm RCC (recursive coreset caching) uses more time than algorithm StreamKM++ (without caching). The reason is under the infrequent scenario, the additional time for updating the cache dominates the runtime. In Figure 8 of the current version, with the increasing query interval until 3200 points, the runtime of all algorithms using caching (CC, RCC, OnlineCC) is always less than the runtime of StreamKM++, finally converges to the same value of 0. Thus, our caching algorithms reduce the runtime under both frequent and infrequent queries. 
+
+2. Improved data structure for accelerating the k-means++ procedure
+In the experimental part of the current version, we improved data structure for accelerating the k-means++ procedure. As the k-means++ seeding procedure is used for coresets merging, this leads to improved update time for all the algorithms.
+
+Consider the update time in Figure 6 of previous conference version, for Covtype dataset when k is 30, the amortized update time per point of all algorithms is more than 15ms / 100points = 0.15ms = 150us. In the corresponding Figure 5 of the current version, the update time per point is at most 6us, that is only 4% of the time that in the previous version.
+
+3. Add one illustrative figure for coreset merging
+Add a figure shows the example of coreset tree construction (Figure 1 in the current version). This helps to understand how the coreset merges in the update process of algorithm CT and CC.
+
+4. Remove the notion of "batch"
+In the theoretical analysis section of the conference version, it uses the notion of "batch", where new points of the same batch comes together and queries are posted at the end of each batch.
+
+In the current version, we remove the notion of "batch". Now the points are coming one by another from the stream, and the queries can happen at any time. Our theoretical analysis on time and space complexity is now based on the number of base buckets (denoted by N) received so far from the stream. 
+
+In the experimental section of current version, we measure the average runtime per point instead of per batch comparing to the conference version. This result of runtime per point also coincides with the time complexity analysis in the theoretical part of Lemma 3, 7, 8, 9. 
+
+5. Proof on the accuracy of algorithm OnlineCC
+Previously, proof of Lemma 10 is omitted in the conference version. This lemma is used as the prerequisite of Lemma 11, which provides the accuracy guarantee of the OnlineCC algorithm. The current version of manuscript includes this proof. 
+
+6. Add experiments with different bucket sizes
+The current version adds new experiments of sensitive analysis with different bucket sizes. The result on accuracy is shown in Figure 9, result on average update time per point is in Figure 10, average query time per point is in Figure 11 and the average runtime is in Figure 12. 
+
+7. Add experiments with queries arriving in Poisson process
+The current version adds new experiments on the performance under Poisson process queries. Earlier we only treated the queries with constant arrival interval. The new experiments set different arrival rate and validate the performance of our algorithms in a more realistic way.
+
+8. Add experiments on OnlineCC with different switch threshold parameters
+Compare the performance of algorithm OnlineCC (the hybrid approach of sequential k-means and coreset caching algorithms) under different "switch threshold" parameters. The result is shown in Figure 16 and the section of result discussion is in "Switching Threshold of OnlineCC". Based on the runtime performance, we give a recommended range of 'switch threshold' parameters, which balance the accuracy requirement and runtime efficiency.
+
+9. Increase the range of number of clusters 
+For the experiments that comparing the performance under different number of clusters k, we change the range of k to 10-50, which is a broader range of values than in the conference version. With the broader range of values on k, the result of current version can give more sights to the algorithm performance.

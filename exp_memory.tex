@@ -1,0 +1,21 @@
+%-------------
+\begin{table*}
+{ 
+\small
+\centering
+\begin{tabular}
+{|c|c c c c| c c c c|}
+\hline
+\multirow{2}{*}{Dataset} & \multicolumn{4}{ c| }{Memory cost in points}  & \multicolumn{4}{ c| }{Memory cost in Megabytes (MB)} \\  \cline{2-9}
+& \skmpp & \cc & \rcc & \hybrid  & \skmpp & \cc & \rcc & \hybrid \\  \hline
+\covtype  & 5950  & 11350  & 36550  & 11380  & 2.57 & 4.90  & 15.78  & 4.92  \\   \hline
+\power  & 7150  & 13750  & 68950  & 13780  & 0.40  & 0.77  & 3.86  & 0.77  \\   \hline
+\intrusion  & 5950  & 11350  & 32950  & 11380  & 1.62 & 3.09  & 8.96  & 3.10  \\   \hline
+\drift  & 5350  & 10150  & 20950  & 10180 & 2.91 & 5.52  & 11.40  & 5.54   \\   \hline
+\end{tabular}
+\smallskip
+\caption{Memory cost of algorithms, number of clusters $k$ is set to $30$ .}
+\label{table:memory-cost}
+}
+\end{table*}
+%------------

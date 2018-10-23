@@ -1,0 +1,131 @@
+\ProvidesPackage{ktmath}
+
+\RequirePackage{ifthen}
+\RequirePackage{amsmath}
+
+\newcommand{\ktmLoadsym}{no}
+\DeclareOption{amssymb}{%
+  \renewcommand{\ktmLoadsym}{yes}
+}
+\newcommand{\ktmDeclareProof}{yes}
+\DeclareOption{noproof}{
+  \renewcommand{\ktmDeclareProof}{no}
+}
+\newcommand{\ktmUseChapter}{no}
+\DeclareOption{thmchapter}{
+  \renewcommand{\ktmUseChapter}{yes}
+}
+\ProcessOptions\relax
+
+\ifthenelse{\equal{\ktmLoadsym}{yes}}{%
+  \RequirePackage{amssymb}%
+}
+{}
+\RequirePackage{bbm}
+\RequirePackage{bm}
+%\RequirePackage{amsthm}
+\RequirePackage{xspace}
+\RequirePackage{ntheorem}
+
+\newcommand{\R}[0]{{\ensuremath{\mathbb{R}}}}
+\newcommand{\N}[0]{{\ensuremath{\mathbb{N}}}}
+\newcommand{\Z}[0]{{\ensuremath{\mathbb{Z}}}}
+\newcommand{\F}[0]{{\ensuremath{\mathbb{F}}}}
+\newcommand{\Complex}[0]{{\ensuremath{\mathbb{C}}}}
+\newcommand{\vareps}[0]{\varepsilon}
+
+\newcommand{\event}{\ensuremath{\mathcal{E}}\xspace}
+
+
+\newcommand{\mat}[1]{\mathbf{#1}\xspace}
+\newcommand{\bvec}[1]{\mathbf{#1}\xspace}
+
+\newcommand{\bigdot}{\bullet}
+
+\newcommand{\trace}[1]{\mathop{\mathsf{Tr}}\left[#1\right]}
+\newcommand{\tr}[0]{\ensuremath{\top}}
+\newcommand{\norm}[2][\mbox{}]{\ensuremath{\Vert {#2} \Vert_{#1}}}
+\newcommand{\dotp}[2]{\ensuremath{\left \langle {#1}, {#2} \right\rangle}\xspace}
+\newcommand{\xx}{\bm{x}}
+\newcommand{\opt}{\ensuremath{{\normalfont\textsf{opt}}}\xspace}
+\newcommand{\onef}[1]{\bm{1}_{\{#1\}}}
+
+\newcommand{\pparen}[1]{\left(#1\right)}
+
+\ifthenelse{\equal{\ktmUseChapter}{yes}}{%
+  \numberwithin{equation}{chapter}
+  \newtheorem{theorem}{Theorem}[chapter]
+}{
+%\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}
+}
+
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{conjecture}{Conjecture}
+% \newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{lemma}{Lemma}
+\newtheorem{fact}{Fact}
+\newtheorem{claim}{Claim}
+\newtheorem{construction}{Construction}
+\newtheorem{corollary}{Corollary}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}{Remark}[section]
+
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{%
+\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{%
+\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{%
+\clap{$\mathsurround=0pt#1{#2}$}}
+
+\newcommand{\eqdef}[0]{\stackrel{{\smash{\textsf{def}}}}{=}}
+
+\newcommand{\RNC}{\normalfont\textsf{RNC}\xspace}
+\newcommand{\NC}{\normalfont\textsf{NC}\xspace}
+\newcommand{\PCLASS}{\normalfont\textsf{P}\xspace}
+\newcommand{\NP}{\normalfont\textsf{NP}\xspace}
+\newcommand{\DTIME}{\normalfont\textsf{DTIME}\xspace}
+\newcommand{\polylog}{\mathop{\normalfont\mathrm{polylog}}}
+
+%\newcommand{\prob}[2][{\!\!}]{\ensuremath{\mathop{\text{\normalfont {\textbf{Pr}}}}_{#1}\left[#2\right]}}
+\newcommand{\prob}[2][{}]{\ensuremath{\mathop{\text{\normalfont {\textbf{Pr}}}}_{#1}\!\left[#2\right]}}
+%\newcommand{\probx}[2]{\ensuremath{\text{\normalfont {\textbf{Pr}}$\left[#1\right]$}}}
+\newcommand{\expct}[2][{}]{\ensuremath{\mathop{\text{\normalfont \textbf{E}}}_{#1}\!\left[#2\right]}}
+\newcommand{\expcti}[2][{}]{\ensuremath{\mathop{\text{\normalfont \textbf{E}}}_{#1}[#2]}}
+%\newcommand{\expctx}[4][{}][\left][\right]{\ensuremath{\mathop{\text{\normalfont \textbf{E}}}_{#1}\!#3[#2#4]}}
+%{\ensuremath{\text{\normalfont \textbf{E}$\left[#1\right]$}}}
+%\newcommand{\expctx}[2]{\ensuremath{\mathop{\text{\normalfont \textbf{E}}}_{#1}}\left[#2\right]}
+
+
+\newcommand{\otilde}{\ensuremath{\widetilde{O}}\xspace}
+
+\newcommand{\poly}{\mathrm{poly}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\ts}{\textstyle}
+
+\ifthenelse{\equal{\ktmDeclareProof}{no}}{%
+}
+{%
+  \newenvironment{proof}[1][]{\noindent\emph{Proof{\xspace #1}: }}{\hfill$\blacksquare$\\}
+}
+\newenvironment{proofof}[1]{
+
+  \noindent\textbf{Proof of {#1}:}}
+{\hfill$\blacksquare$
+
+
+}
+
+
+\newcommand{\pEREW}{\normalfont\textsf{EREW}\xspace}
+\newcommand{\pPRAM}{\normalfont\textsf{PRAM}\xspace}
+\newcommand{\pCRCW}{\normalfont\textsf{CRCW}\xspace}
+
+
+
+%%%

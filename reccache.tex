@@ -1,0 +1,286 @@
+\subsection{Algorithm $\rcc$: Recursive Coreset Cache}
+\newcommand{\rmax}{\rho}
+\newcommand{\order}{\texttt{order}}
+\newcommand{\mainds}{\mathcal{R}}
+
+There are still a few issues with the $\cc$ data structure. First, the level of
+the coreset finally generated is $O(\log_rN)$. Since theoretical guarantees on
+the approximation quality of clustering worsen with the number of levels of the
+coreset, it is natural to ask if the level can be further reduced to $O(1)$.
+Moreover, the time taken to process a query is linearly proportional to $r$; we
+wish to reduce the query time even more.  While it is natural to aim to
+simultaneously reduce the level of the coreset as well as the query time, at
+first glance, these two goals seem to be inversely related. It seems that if we
+decreased the level of a coreset (better accuracy), then we will have to
+increase the merge degree, which would in turn increase the query time. For
+example, if we set $r=\sqrt{N}$, then the level of the resulting coreset is
+$O(1)$, but the query time will be $O(\sqrt{N})$.
+
+In the following, we present a solution $\rcc$ that uses the idea of coreset
+caching in a recursive manner to achieve both a low level of the coreset, as
+well as a small query time. In our approach, we keep the merge degree $r$ 
+in a relatively high value, thus keeping the levels of coresets low. 
+At the same time, we use coreset caching even within a single level of a coreset tree, 
+so that there is no need to merge $r$ coresets at query time. 
+Special care is required for coreset caching in this case, 
+so that the level of the coreset does not increase significantly.
+
+For instance, suppose we built another coreset tree with merge degree $2$ for
+the $O(r)$ coresets within a single level of the current coreset tree, this
+would lead to a inner tree with level of $\log r$. At query time, we aggregate
+$O(\log r)$ coresets from this inner tree, in addition to a coreset from the \cc. So, this will lead to a level of $O\left(\max\left\{\frac{\log N}{\log r}, \log r\right \}\right)$ and a query time proportional to $O(\log r)$. This is an improvement from the coreset cache, which has a query time proportional to $r$ and a level of $O\left(\frac{\log N}{\log r}\right)$.
+
+We can take this idea further by recursively applying the same idea to the
+$O(r)$ buckets within a single level of the coreset tree. Instead of having a
+coreset tree with merge degree $2$, we use a tree with a higher merge degree,
+and then have a coreset cache for this tree to reduce the query time, and apply
+this recursively within each tree. This way we can approach the ideal of a small
+level and a small query time. We are able to achieve interesting tradeoffs, as
+shown in Table~\ref{table:rcc}. To keep the level of the resulting coreset low,
+along with the coreset cache for each level, we also maintain a list of coresets
+at each level, like in the $\ct$ algorithm. To merge coresets to a higher level,
+we use the list, rather than the recursive coreset cache.
+
+More specifically, the $\rcc$ data structure is defined inductively as
+follows. For integer $i \ge 0$, the $\rcc$ data structure of order $i$ is
+denoted by $\rcc(i)$. $\rcc(0)$ is a $\cctree$ data structure with a merge
+degree of $r_0 = 2$. For $i>0$, $\rcc(i)$ consists of:
+%-----------------
+%\begin{itemize}[topsep=-0.5em,leftmargin=*, itemsep=2pt]
+\begin{itemize}
+\item $\cache(i)$, a coreset cache storing previous coresets.
+
+\item For each level $\ell = 0, 1, 2, \ldots$, there are two structures. 
+One is a list of buckets $L_{\ell}$, 
+similar to the structure $Q_{\ell}$ in a coreset tree. 
+The maximum length of a list is $r_{i} = 2^{2^i}$. 
+Another is an $\rcc_{\ell}$ structure which is a $\rcc$ 
+structure of a lower order $(i-1)$, which stores the same information as list $L_\ell$, 
+except in a way that can be quickly retrieved during a query.
+\end{itemize}
+%-----------------
+
+The main data structure $\mainds$ is initialized as $\mainds = \rccinit(\iota)$, 
+for a parameter $\iota$, to be chosen. 
+Note that $\iota$ is the highest order of the recursive structure. 
+This is also called the ``nesting depth" of the structure. 
+
+%-----------------
+\begin{algorithm}[t]
+\DontPrintSemicolon
+\caption{$\mainds.\rccinit(\iota)$
+\label{algo:rcc-init}
+}
+$\mainds.\order \gets \iota$, 
+$\mainds.\cache \gets \emptyset$, 
+$\mainds.r \gets 2^{2^{\iota}}$\;
+
+\tcp{$N$ is the number of buckets so far}
+$\mainds.N \gets 0$\; 
+\ForEach{$\ell=0,1,2, \ldots$}
+{
+   $\mainds.L_{\ell} \gets \emptyset$\;
+   \uIf{$\mainds.\order > 0$}
+   {$\mainds.\rcc_{\ell} \gets \mainds.\rccinit(\mainds.\order - 1)$}
+}
+\Return $\mainds$\;
+\end{algorithm}
+%-----------------
+
+%-----------------
+\begin{algorithm}[t]
+\DontPrintSemicolon
+\caption{$\mainds.\rccupdate(b)$
+\label{algo:rcc-update}}
+\tcp{$b$ is a new base bucket}
+$\mainds.N \gets \mainds.N + 1$\;
+\tcp{Insert $b$ into $\mainds.L_0$ and merge if needed}
+Append $b$ to $\mainds.L_0$.\;
+\If{$\mainds.\order > 0$} 
+{
+	recursively update $\mainds.\rcc_0$ by $\mainds.\rcc_0.\rccupdate(b)$ \;
+}
+\;
+\tcp{Clear $\mainds.L$ and $\rcc$ if number of buckets reaches $r$}
+$\ell \gets 0$\;
+\While{$(|\mainds.L_\ell| = \mainds.r)$}
+{
+  %$b' \gets$ {\tt BucketMerge}($\mainds.L_\ell$)\;
+  $b' \gets \coreset(k, \eps, \cup_{B \in \mainds.L_\ell} B)$ \;
+  Append $b'$ to $\mainds.L_{\ell+1}$ \;
+  \If{$\mainds.\order > 0$}
+  {recursively update $\mainds.\rcc_{\ell+1}$ by $\mainds.\rcc_{\ell+1}.\rccupdate(b)$} \;
+  \tcp{Empty the list of coresets $\mainds.L$}
+  $\mainds.L_{\ell} \gets \emptyset$ \;
+  \tcp{Empty the \rcc structure}
+  \If{$\mainds.\order > 0$} 
+  {$\mainds.\rcc_{\ell} \gets \rccinit(\mainds.\order-1)$} \;
+  $\ell \gets \ell + 1$ \;
+}
+\end{algorithm}
+%-----------------
+
+%------------------
+\begin{algorithm}[t]
+\DontPrintSemicolon
+\caption{
+$\mainds.\rcccoreset()$
+\label{algo:rcc-getbuckets}
+\label{algo:rcc-coreset}
+}
+$U \gets \emptyset$ \;
+$N_1 \gets \major(\mainds.N, \mainds.r)$ \;
+\eIf{$N_1$ does not exist in $\mainds.\cache$} 
+{
+	$U \gets \cup_{\ell} \{ \mainds.\rcc_{\ell}.\rcccoreset() \}$ \;
+}
+{
+	$b_1 \gets$ retrieve coreset with endpoint $N_1$ from $\mainds.\cache$\;
+	Let $\ell^*$ be the lowest numbered non-empty level among $\mainds.L_i, i \ge 0$.\;
+	\tcp{Apply $\rcc$ data structure to retrieve the coresets from level $\ell^*$}
+	\eIf{$\mainds.\order > 0$}
+	{$b_2 \gets \mainds.\rcc_{\ell^*}.\rcccoreset()$}
+	{$b_2 \gets \mainds.L_{\ell^*}$}
+	$U \gets b_1 \cup b_2$ 
+}
+
+\tcp{Store coreset into \cache}
+%\If{$\mainds.r$ divides $\mainds.N$}
+%{
+	$b' \gets \coreset(k, \epsilon, U)$\;
+	Add $b'$ to $\mainds.\cache$ with right endpoint $\mainds.N$\;
+	From $\mainds.\cache$, remove all buckets $b''$ such that 
+	$\rightep(b'') \notin \prefixsum(\mainds.N) \cup \{ N \}$ \;
+%}
+\Return $b'$
+\end{algorithm}
+%-----------------
+
+%-----------------
+\begin{table}[ht]
+{
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{ c c c c c}
+\toprule
+$\iota$ & coreset level & Query cost  & update cost & Memory \\
+        & at query      & (per point) & per point   & \\
+\midrule
+$\log \log N - 3$ & $O(1)$ & $O\left( \frac{kdm}{q} \log \log N \right)$ & $O(dm \log \log N)$ & $O\left( dmN^{1/8} \right)$ \\
+\midrule
+$\log \log N / 2$ & $O(\sqrt{\log N})$ & $O \left( \frac{kdm}{q} \log \log N \right)$ & $O(dm \log \log N)$ & $O \left( dm 2^{\sqrt{\log N}} \right)$ \\
+\bottomrule
+\end{tabular}
+\smallskip
+\caption{Possible tradeoffs for the $\rcc(\iota)$ algorithm, based on the parameter $\iota$, the nesting depth of the structure.
+\label{table:rcc}}
+}
+\end{table}
+%-----------------
+
+%-----------------
+\begin{lemma}
+\label{lemma:rcc-level}
+When queried after inserting $N$ buckets, 
+Algorithm~\ref{algo:rcc-coreset} using $\rcc(\iota)$ returns a coreset 
+whose level is $O\left(\frac{\log N}{2^{\iota}}\right)$. 
+The amortized time cost of answering a clustering query is 
+$O\left(\frac{kdm}{q} \cdot \log \log N \right)$ per point. 
+\end{lemma}
+%-----------------
+\begin{proof}
+Algorithm~\ref{algo:rcc-coreset} retrieves a few coresets from $\rcc$ of different orders. 
+From the outermost structure $\rcc(\iota)$, 
+it retrieves one coreset $c$ from $\cache(\iota)$. 
+Using an analysis similar to Lemma~\ref{lemma:cctree-level}, 
+the level of $b_{1}$ is no more than $\frac{2 \log N}{\log r_{\iota}}$. 
+
+Note that for $i < \iota$, the maximum number of coresets that will be inserted
+into $\rcc(i)$ is $r_{i+1} = r_i^2$. The reason is that inserting $r_{i+1}$
+buckets into $\rcc(i)$ will lead to the corresponding list structure for
+$\rcc(i)$ to become full. At this point, the list and the $\rcc(i)$ structure
+will be emptied out in Algorithm~\ref{algo:rcc-update}. From each recursive call
+to $\rcc(i)$, it can be similarly seen that the level of a coreset retrieved
+from the cache is at level $\frac{2 \log{r_i}}{\log r_{i-1}}$, which is
+$O(1)$. The algorithm returns a coreset formed by the union of all the coresets,
+followed by a further merge step. Thus, the coreset level is one more than the
+maximum of the levels of all the coresets returned, which is
+$O\left( \frac{\log N}{\log r_{\iota}} \right)$.
+
+For the query cost, similar to our analysis in $\cc$, we assume that 
+for each order of $\rcc(i)$, we can always use the cache in coreset queries.
+Comparing to Algorithm~\cccoreset, the minor part of coreset is retrieved from the inner 
+\rcc data structure with lower order. Thus, for each order of $\rcc$, the number 
+of coresets merged is $2$. The number of coresets merged at query time 
+is equal to two times the nesting depth of the structure, that is $2 \cdot \iota$. 
+The query time equals the cost of running $\kmpp$ on the union of all these coresets, 
+for a total time of $O(kd m \log \log N)$. The amortized per-point cost of a query follows.
+
+\remove{
+Consider the case that the coreset of major does not exist in the cache. 
+Suppose all the caches at different order are not available, our algorithm 
+uses \ctcoreset to retrieve coresets at each order of \rcc. 
+Note that the number of levels for each $\rcc(i)$ is at most $2$ except the $\rcc(\iota)$. 
+The reason is as follows. 
+It is necessary to insert $r_{i+1} = r_i^2$ buckets into $\rcc(i)$. 
+Since this is the maximum number of buckets that will be inserted into $\rcc(i)$, 
+there are at most two levels of lists within each $\rcc(i)$ for $i < \iota$.
+The number of coresets be merged for $\rcc(\iota-1)$ is $2^{\iota-1}$, which is $O(\log r_{\iota})$.
+The total number of coresets be merged is 
+$O\left( \frac{\log N}{\log r_{\iota}} \cdot \log r_{\iota} \right) = O(\log N)$, 
+and query time is $O(kd m \log N)$.
+}
+\end{proof}
+%-----------------
+
+
+%-----------------
+\begin{lemma}
+\label{lemma:rcc-performance}
+The memory consumed by $\rcc(\iota)$ is $O(dm r_{\iota})$. 
+The amortized processing time is $O(dm \log \log N)$ per point.
+\end{lemma}
+%-----------------
+\begin{proof}
+First, as stated in the proof of Lemma~\ref{lemma:rcc-level}, 
+in $\rcc(i)$ for $i < \iota$, there are at most two level of lists $L_{\ell}$. 
+
+%First, we note in $\rcc(i)$ for $i < \iota$, there are $O(1)$ lists $L_{\ell}$.
+%The reason is as follows. 
+%It can be seen that in order to get a single bucket in list $L_2$ within $\rcc(i)$, 
+%it is necessary to insert $r_i^2=r_{i+1}$ buckets into $\rcc(i)$. 
+%Since this is the maximum number of buckets that will be inserted into $\rcc(i)$, 
+%there are no more than three levels of lists within each $\rcc(i)$ for $i < \iota$. 
+
+We prove by induction on $i$ that $\rcc(i)$ has no more than $6r_i$ buckets.  
+For the base case, $i=0$, and we have $r_0=2$. 
+In this case, $\rcc(0)$ has two levels, each with no more than $2$ buckets. 
+So that the total memory is no more than $6$ buckets, due to the lists in two levels, 
+and no more than $2$ buckets in the cache, for a total of $6=3r_0 < 6r_0$ buckets. 
+For $i=1$,  $r_1=4$, the two lists have at most $8$ buckets and cache has no more than $2$ buckets. 
+The recursive structures $\rcc(0)$ has $6$ buckets and there are two recursive structures, one for each level. 
+Thus in total $\rcc(1)$ has no more than $22$ buckets, which is less than $24 = 6r_1$ buckets. 
+
+For the inductive case, consider that $\rcc(i)$, the list at each level has no more than $r_i$ buckets. 
+The recursive structures $\rcc_{\ell}$ within $\rcc(i)$ themselves have no more than $6r_{i-1}$ buckets. 
+Adding the constant number of buckets within the cache, 
+we get the total number of buckets within $\rcc(i)$ to be 
+$2r_i + 2 \cdot 6r_{i-1} + 2 = 2r_i + 12 \sqrt{r_i} + 2 \le 6 r_i$, 
+for $r_i \ge 16$, i.e. $i \ge 2$. 
+Thus if $\iota$ is the nesting depth of the structure, 
+the total memory consumed is $O(dm r_{\iota})$, since each bucket requires $O(dm)$ space.
+
+For the updating process time cost, when a bucket is inserted into $\mainds = \rcc(\iota)$, 
+it is added to list $L_0$ within $\mainds$. 
+The cost of maintaining these lists, 
+that is the cost of merging into higher level lists, 
+is amortized $O(dm)$ per point, 
+similar to the analysis in Lemma~\ref{lemma:cctree-time}. 
+The bucket is also recursively inserted into a $\rcc(\iota-1)$ structure, 
+and a further structure within, 
+and the amortized time for each such structure is $O(dm)$ per point. 
+The total time cost is $O(dm\iota)$ per point which is equal to $O(dm \log \log N)$.
+\end{proof}
+%-----------------
+
+Different tradeoffs are possible by setting $\iota$ to specific values. Some examples are shown in the Table~\ref{table:rcc}.

@@ -1,0 +1,77 @@
+% This paper makes several contributions.  Our theoretical results are summarized
+% in Table~\ref{table:summary}.
+% %
+% % let $n$ denote the number of points observed in the stream so
+% % far.
+
+% % Let $N=\frac{n}{m}$, where $m$ is the size of a coreset, be a parameter
+% % that is independent of $n$. Our main contributions are as follows:
+% \begin{itemize}[label={---},leftmargin=*,topsep=0pt,itemsep=0.5em]
+% \item We present an algorithm ``Cached Coreset Tree'' ($\cc$) whose query
+%   runtime is a factor of $O(\log N)$ smaller than the query runtime of a current
+%   state-of-the-art method, ``Coreset Tree" ($\ct$), \footnote{$\ct$ is
+%     essentially the \skmpp algorithm~\cite{AMR+12} and~\cite{AJM09} except it
+%     has a more flexible rule for merging coresets.} while using similar memory
+%   and maintaining the same quality of approximation.
+
+% \item We present a recursive version of $\cc$, ``Recursive Cached Coreset Tree" ($\rcc$), which provides more flexible tradeoffs for the memory used, quality of approximation, and query cost. For instance, it is possible to improve the query runtime by a factor of $O(\log N/\log \log N)$, and improve the quality of approximation, at the cost of greater memory.
+
+\item We present an algorithm $\hybrid$, a combination of \cc and a simple sequential streaming clustering algorithm (due to~\cite{MacQueen67}), which provides further improvements in clustering query runtime while still maintaining the provable clustering quality, as in \rcc and \cc.
+
+\item For all algorithms, we prove that the $k$ centers returned in response to
+  a query form an $O(\log k)$ approximation to the optimal $k$-means clustering
+  cost. In other words, the quality is comparable to what we will obtain if we
+  simply stored all the points so far in memory, and ran an (expensive) batch
+  $\kmpp$ algorithm at query time.
+
+\item We present a detailed experimental evaluation. These show that when compared with \skmpp~\cite{AMR+12}, a state-of-the-art method for streaming $k$-means clustering, our algorithms yield substantial speedups (5x-100x) in query runtime and in total time, and match the accuracy for a broad range of query arrival frequencies. 
+%As we show, the query runtime and total processing time (including query and update time) are an order of magnitude faster than current state-of-the-art, for a broad range of query arrival frequencies.
+\end{itemize}
+
+%The coreset cache can work in parallel with the ``coreset tree" data structure described above, and its goal is in a sense orthogonal to the goal of the coreset tree. While the coreset tree is aimed at maintaining provably good summaries of data in small space, the coreset cache is aimed at answering queries quickly. In using the coreset cache, we need to be careful on two aspects. First, with using a cached coreset, the accuracy of an answer can degrade, especially when there is a long ``chain" of reusing previous cached coreset to generate a new cached coreset. It is important to return to the coreset tree at key points in computation to keep the accuracy guarantees.  Second, we need to manage the number of coresets that are cached at a time, to retain the ``limited memory" property of the algorithm. 
+
+
+
+
+
+% The simplest algorithm ``Cached Coreset Tree'' ($\cc$) has a query runtime that
+% is a factor of $O(\log N)$ smaller than the query runtime of a current
+% state-of-the-art method, ``Coreset Tree" ($\ct$),   while using similar memory and
+% maintaining the same quality of approximation.  To allow for more flexible
+% tradeoffs among the memory used, quality of approximation, and query cost, our
+% ``Recursive Cached Coreset Tree'' ($\rcc$) algorithm applies the idea from \cc{}
+% recursively. With this scheme, it is possible, for instance, to improve the
+% query runtime by a factor of $O(\log N/\log \log N)$, and improve the quality of
+% approximation, at the cost of greater memory.
+
+
+
+
+% %------------------------------------------
+% \subsection{Our Contributions}
+% \label{sec:contr}
+% %------------------------------------------
+% We present algorithms for streaming $k$-means whose query runtime is
+% substantially smaller than the current state-of-the-art, while maintaining the
+% desirable properties of a low memory footprint and provable approximation
+% guarantees on the result. Our algorithms are based on the idea of ``coreset
+% caching" that to our knowledge, has not been used before in streaming
+% clustering. The idea in coreset caching is to {\em reuse coresets that have been
+%   computed during previous (recent) queries to speedup the computation of a
+%   coreset for the current query}. This way, when a query arrives, the algorithm
+% has no need to combine all coresets currently in memory; it only needs to merge
+% a coreset from a recent query (stored in the coreset cache) along with coresets
+% of points that arrived after this query. We show that this leads to substantial
+% savings in query runtime without significantly affecting the accuracy
+
+
+%%% RELATED
+
+% However, it does not
+% have a provable approximation guarantee on the quality of the
+% clusters. \kmpp~\cite{AV07} presents a method to determine the starting
+% configuration for Lloyd's algorithm that yields a provable guarantee on the
+% clustering cost. \cite{BMV+12} proposes a parallelization of \kmpp called \kmII.
+
+%Streaming
+The earliest streaming clustering method, \seqkm (due to \cite{MacQueen67}), maintains the current cluster centers and applies one iteration of Lloyd's algorithm for every new point received. Because it is fast and easy to implement, \seqkm is commonly used in practice (e.g., Apache Spark mllib~\cite{MBY+15}). However, it cannot provide any approximation guarantees~\cite{KMN+04} on the cost of clustering. BIRCH~\cite{ZRL96} is a streaming clustering method based on a data structure called the ``CF Tree'', and returns cluster centers through agglomerative hierarchical clustering on the leaf nodes of the tree. CluStream\cite{AHW+03} constructs ``microclusters'' that summarize subsets of the stream, and further applies a weighted \km algorithm on the microclusters. STREAMLS~\cite{GMM+03} is a divide-and-conquer method based on repeated application of a bicriteria approximation algorithm for clustering. A similar divide-and-conquer algorithm based on \kmpp is presented in~\cite{AJM09}. However, these methods have a high cost of query processing, and are not suitable for continuous maintenance of clusters, or for frequent queries. In particular, at the time of query, these require merging of multiple data structures, followed by an extraction of cluster centers, which is expensive. %We will provide a more detailed comparison with our work in later sections.

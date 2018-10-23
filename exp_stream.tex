@@ -1,0 +1,39 @@
+%----------------
+\begin{figure*}
+  \centering
+  \subfloat[\covtype]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/accuracy_num/covtype_cost_vs_num.pdf}
+  }
+  \subfloat[\power]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/accuracy_num/power_cost_vs_num.pdf}
+  }
+  \subfloat[\intrusion  (\seqkm not shown)]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/accuracy_num/intrusion_cost_vs_num.pdf}
+  }
+  \subfloat[\drift]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/accuracy_num/synthetic_cost_vs_num.pdf}
+  }
+\caption{\km cost vs. number of points. The number of clusters $k$ is $30$.}
+\label{fig:cost-versus-stream}
+\end{figure*}
+%----------------
+
+%----------------
+\begin{figure*}
+  \centering
+  \subfloat[\covtype]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/totaltime_num/covtype_total_vs_num.pdf}
+  }
+  \subfloat[\power]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/totaltime_num/power_total_vs_num.pdf}
+  }
+  \subfloat[\intrusion]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/totaltime_num/intrusion_total_vs_num.pdf}
+  }
+  \subfloat[\drift]{
+  \centering \includegraphics[width=0.23\textwidth]{expfigs/totaltime_num/synthetic_total_vs_num.pdf}
+  }
+  \caption{Average runtime per point (milliseconds) vs. number of points. The number of clusters $k$ is $30$.}
+\label{fig:time-versus-stream}
+\end{figure*}
+%----------------

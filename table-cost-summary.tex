@@ -1,0 +1,34 @@
+%--------------------------------------------------------------------------------------------------
+\begin{table*}[ht]
+{
+\small
+\centering
+\begin{tabular}{|c| c| c| c| c|}
+\hline
+Name & Query Cost & Update Cost & Memory Used & Accuracy: Coreset level  \\
+           & (per point)   & (per point)    & & returned at query  \\
+\hline
+Coreset Tree ($\ct$) & $O\left( \frac{kdm}{q} \cdot \frac{r \log N}{\log r}\right)$ &  $O(dm)$ & $O\left(dm \cdot \frac{r \log N}{\log r}\right)$ & $\log N / \log r$ \\
+\hline
+Cached Coreset Tree ($\cc$)&  $O\left(\frac{kdm}{q} \cdot r \right)$ & $O(dm)$ & $O\left(dm \cdot \frac{r\log N}{\log r} \right)$ & $2  \log N / \log r$\\
+\hline
+Recursive Cached Coreset Tree ($\rcc$) & $O\left(\frac{kdm}{q} \cdot \log \log N \right)$ & $O(dm \log \log N)$ & $O(dm N^{1/8})$ & $O(1)$ \\
+\hline
+Online Coreset Cache ($\hybrid$)  & usually $O(1)$ worst case $O\left(\frac{kdm}{q} \cdot r \right)$ & $O(dm)$ & $O\left(dm \cdot \frac{r\log N}{\log r} \right)$  & $2 \log N / \log r$  \\
+\hline
+\end{tabular}
+\smallskip
+}
+\caption{The time and accuracy of different clustering algorithms. For algorithms other than $\ct$, we assume answering queries by using the coreset cache.}
+% $k$ is the
+%   number of centers desired, $d$ is the dimension of a data point, $m$ is the
+%   size of a coreset (in practice, this is a constant factor times $k$), $r$ is a
+%   parameter used for $\cc$ and $\ct$, showing the ``merge degree" of the coreset
+%   tree, $q$ is the number of points between two queries. The ``level" of a
+%   coreset is indicative of the number of recursive merges of prior coresets to
+%   arrive at this coreset. Smaller the level, more accurate is the coreset. For
+%   example, a batch algorithm that sees the entire input can return a coreset at
+%   level $0$.}
+\label{table:summary}
+\end{table*}
+%--------------------------------------------------------------------------------------------------
